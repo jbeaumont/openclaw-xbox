@@ -17,6 +17,10 @@
       "minGatewayVersion": "2026.3.24-beta.2"
     }
   },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc"
+  },
   "dependencies": {
     "@sinclair/typebox": "^0.34.0"
   },
