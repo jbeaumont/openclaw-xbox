@@ -18,6 +18,7 @@
       "xbox_session_config"
     ]
   },
+  "skills": ["./skills"],
   "activation": {
     "onStartup": true
   },

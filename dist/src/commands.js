@@ -216,6 +216,14 @@ export function registerCommands(api, apiKey) {
         description: "Xbox Live — /xbox help for all commands",
         acceptsArgs: true,
         requireAuth: false,
+        agentPromptGuidance: [
+            "Use xbox_my_profile to get the user's own Xbox profile, gamertag, or gamerscore.",
+            "Use xbox_search_player to look up any player by gamertag.",
+            "Use xbox_friends_presence to see who is online and what friends are playing.",
+            "Use xbox_my_achievements to see the user's achievement progress across all titles.",
+            "Use xbox_sessions to check active multiplayer sessions and party members.",
+            "Use xbox_gamepass_all, xbox_gamepass_pc, or xbox_gamepass_ea_play for Game Pass catalog.",
+        ],
         handler: async (ctx) => {
             const args = ctx.args ?? "";
             const parts = args.trim().split(/\s+/);
