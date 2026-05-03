@@ -11,21 +11,16 @@
   },
   "openclaw": {
     "extensions": ["./index.ts"],
-    "runtimeExtensions": ["./dist/index.js"],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"
     }
   },
-  "scripts": {
-    "build": "tsc",
-    "prepare": "tsc"
-  },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.0"
+    "@sinclair/typebox": "^0.34.0",
+    "typescript": "^5.4.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
     "openclaw": "latest"
   }
 }
