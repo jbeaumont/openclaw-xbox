@@ -8,9 +8,8 @@ function makeGamePassTool(api, apiKey, name, description, path) {
         description,
         parameters: EmptyParamSchema,
         async execute() {
-            const data = await xblFetch(apiKey, path);
-            const titles = data.titles ?? [];
-            if (titles.length === 0)
+            const titles = await xblFetch(apiKey, path);
+            if (!Array.isArray(titles) || titles.length === 0)
                 return toolResult("No titles found.");
             return toolResult(JSON.stringify(titles, null, 2));
         },

@@ -40,8 +40,8 @@ function formatFriend(f) {
 }
 function formatGamePassTitle(t) {
     let line = `• **${t.title}**`;
-    if (t.developers?.length)
-        line += ` — ${t.developers[0]}`;
+    if (t.description)
+        line += ` — ${t.description}`;
     return line;
 }
 function formatSession(s) {
@@ -130,10 +130,20 @@ async function handleSearch(apiKey, gamertag) {
     if (!gamertag)
         return "Usage: `/xbox search <gamertag>`";
     const data = await xblFetch(apiKey, `/search/${encodeURIComponent(gamertag)}`);
-    const profile = data.profileUsers?.[0];
-    if (!profile)
+    const person = data.people?.[0];
+    if (!person)
         return `No player found for gamertag: **${gamertag}**`;
-    return formatProfile(profile);
+    const lines = [`**${person.gamertag ?? gamertag}**`];
+    if (person.gamerScore)
+        lines.push(`Gamerscore: ${parseInt(person.gamerScore).toLocaleString()}`);
+    if (person.realName)
+        lines.push(`Name: ${person.realName}`);
+    if (person.presenceState)
+        lines.push(`Status: ${person.presenceState}`);
+    if (person.presenceText)
+        lines.push(person.presenceText);
+    lines.push(`XUID: \`${person.xuid}\``);
+    return lines.join("\n");
 }
 async function handleAchievements(apiKey) {
     const data = await xblFetch(apiKey, "/achievements");
@@ -167,9 +177,8 @@ async function handleGamePass(apiKey, sub) {
     const target = pathMap[sub];
     if (!target)
         return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
-    const data = await xblFetch(apiKey, target.path);
-    const titles = data.titles ?? [];
-    if (titles.length === 0)
+    const titles = await xblFetch(apiKey, target.path);
+    if (!Array.isArray(titles) || titles.length === 0)
         return `No titles found in ${target.label}.`;
     const lines = [
         `**${target.label}** — ${titles.length} titles`,

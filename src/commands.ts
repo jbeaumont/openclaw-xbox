@@ -40,7 +40,7 @@ function formatFriend(f: Friend): string {
 
 function formatGamePassTitle(t: GamePassTitle): string {
   let line = `• **${t.title}**`;
-  if (t.developers?.length) line += ` — ${t.developers[0]}`;
+  if (t.description) line += ` — ${t.description}`;
   return line;
 }
 
@@ -126,13 +126,19 @@ async function handleFriends(apiKey: string): Promise<string> {
 
 async function handleSearch(apiKey: string, gamertag: string): Promise<string> {
   if (!gamertag) return "Usage: `/xbox search <gamertag>`";
-  const data = await xblFetch<{ profileUsers: Profile[] }>(
+  const data = await xblFetch<{ people: Friend[] }>(
     apiKey,
     `/search/${encodeURIComponent(gamertag)}`
   );
-  const profile = data.profileUsers?.[0];
-  if (!profile) return `No player found for gamertag: **${gamertag}**`;
-  return formatProfile(profile);
+  const person = data.people?.[0];
+  if (!person) return `No player found for gamertag: **${gamertag}**`;
+  const lines = [`**${person.gamertag ?? gamertag}**`];
+  if (person.gamerScore) lines.push(`Gamerscore: ${parseInt(person.gamerScore).toLocaleString()}`);
+  if (person.realName) lines.push(`Name: ${person.realName}`);
+  if (person.presenceState) lines.push(`Status: ${person.presenceState}`);
+  if (person.presenceText) lines.push(person.presenceText);
+  lines.push(`XUID: \`${person.xuid}\``);
+  return lines.join("\n");
 }
 
 async function handleAchievements(apiKey: string): Promise<string> {
@@ -165,9 +171,8 @@ async function handleGamePass(apiKey: string, sub: string): Promise<string> {
   const target = pathMap[sub];
   if (!target) return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
 
-  const data = await xblFetch<{ titles: GamePassTitle[] }>(apiKey, target.path);
-  const titles = data.titles ?? [];
-  if (titles.length === 0) return `No titles found in ${target.label}.`;
+  const titles = await xblFetch<GamePassTitle[]>(apiKey, target.path);
+  if (!Array.isArray(titles) || titles.length === 0) return `No titles found in ${target.label}.`;
 
   const lines = [
     `**${target.label}** — ${titles.length} titles`,

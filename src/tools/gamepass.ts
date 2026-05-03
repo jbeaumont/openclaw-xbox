@@ -16,9 +16,8 @@ function makeGamePassTool(
       description,
       parameters: EmptyParamSchema,
       async execute() {
-        const data = await xblFetch<{ titles: GamePassTitle[] }>(apiKey, path);
-        const titles = data.titles ?? [];
-        if (titles.length === 0) return toolResult("No titles found.");
+        const titles = await xblFetch<GamePassTitle[]>(apiKey, path);
+        if (!Array.isArray(titles) || titles.length === 0) return toolResult("No titles found.");
         return toolResult(JSON.stringify(titles, null, 2));
       },
     },

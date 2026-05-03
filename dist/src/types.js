@@ -10,9 +10,10 @@ export function getSetting(profile, settingId) {
 }
 export const FriendSchema = Type.Object({
     xuid: Type.String(),
-    gamertag: Type.String(),
+    gamertag: Type.Optional(Type.String()),
     modernGamertag: Type.Optional(Type.String()),
     gamerScore: Type.Optional(Type.String()),
+    realName: Type.Optional(Type.String()),
     presenceState: Type.Optional(Type.String()),
     presenceText: Type.Optional(Type.String()),
     isFavorite: Type.Optional(Type.Boolean()),
@@ -36,14 +37,10 @@ export const GameTitleSchema = Type.Object({
 });
 export const GamePassTitleSchema = Type.Object({
     id: Type.Optional(Type.String()),
+    siglId: Type.Optional(Type.String()),
     title: Type.String(),
-    developers: Type.Optional(Type.Array(Type.String())),
-    publishers: Type.Optional(Type.Array(Type.String())),
-    categories: Type.Optional(Type.Array(Type.String())),
-    images: Type.Optional(Type.Array(Type.Object({
-        type: Type.Optional(Type.String()),
-        url: Type.Optional(Type.String()),
-    }))),
+    description: Type.Optional(Type.String()),
+    imageUrl: Type.Optional(Type.String()),
 });
 export const SessionSchema = Type.Object({
     sessionId: Type.Optional(Type.String()),
