@@ -4,6 +4,7 @@ import { registerPresenceTools } from "./src/tools/presence.js";
 import { registerAchievementTools } from "./src/tools/achievements.js";
 import { registerGamePassTools } from "./src/tools/gamepass.js";
 import { registerSessionTools } from "./src/tools/sessions.js";
+import { registerCommands } from "./src/commands.js";
 
 export default definePluginEntry({
   id: "openclaw-xbox",
@@ -11,10 +12,13 @@ export default definePluginEntry({
   description: "Xbox Live tools via xbl.io — profiles, presence, achievements, Game Pass catalog, and sessions",
 
   register(api) {
-    const apiKey = api.config.get<string>("apiKey");
+    const apiKey = api.config.get<string>("apiKey") || undefined;
+
+    // Commands are always registered — /xbox setup works even without a key
+    registerCommands(api, apiKey);
 
     if (!apiKey) {
-      api.logger?.warn("openclaw-xbox: no apiKey configured — all tools will be unavailable");
+      api.logger?.warn("openclaw-xbox: no apiKey configured — agent tools unavailable, run /xbox setup");
       return;
     }
 
