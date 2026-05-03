@@ -1,0 +1,34 @@
+{
+  "id": "openclaw-xbox",
+  "name": "Xbox Live",
+  "description": "Xbox Live tools via xbl.io — look up profiles, presence, achievements, Game Pass catalog, and active sessions",
+  "contracts": {
+    "tools": [
+      "xbox_my_profile",
+      "xbox_search_player",
+      "xbox_friends_presence",
+      "xbox_player_presence",
+      "xbox_my_achievements",
+      "xbox_player_achievements",
+      "xbox_gamepass_all",
+      "xbox_gamepass_pc",
+      "xbox_gamepass_ea_play",
+      "xbox_sessions",
+      "xbox_session_config"
+    ]
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "required": ["apiKey"],
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Your xbl.io API key (X-Authorization header)"
+      }
+    }
+  }
+}
