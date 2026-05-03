@@ -22,7 +22,6 @@
   },
   "configSchema": {
     "type": "object",
-    "required": ["apiKey"],
     "additionalProperties": false,
     "properties": {
       "apiKey": {
