@@ -146,8 +146,14 @@ async function handleSearch(apiKey, gamertag) {
     return lines.join("\n");
 }
 async function handleAchievements(apiKey) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = await xblFetch(apiKey, "/achievements");
-    const titles = Array.isArray(raw) ? raw : (raw.titles ?? []);
+    const isArr = Array.isArray(raw);
+    const keys = Object.keys(raw ?? {}).slice(0, 6).join(",");
+    const titlesVal = raw?.titles;
+    const titlesIsArr = Array.isArray(titlesVal);
+    return `isArr=${isArr} keys=[${keys}] titlesType=${typeof titlesVal} titlesIsArr=${titlesIsArr} titlesLen=${titlesIsArr ? titlesVal.length : "n/a"}`;
+    const titles = isArr ? raw : (titlesVal ?? []);
     if (titles.length === 0)
         return "No achievement titles found.";
     const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
