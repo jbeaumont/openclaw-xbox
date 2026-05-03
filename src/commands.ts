@@ -192,6 +192,7 @@ export function registerCommands(api: OpenClawPluginApi, apiKey: string | undefi
     name: "xbox",
     description: "Xbox Live — /xbox help for all commands",
     acceptsArgs: true,
+    requireAuth: false,
     handler: async (ctx) => {
       const args = ctx.args ?? "";
       const parts = args.trim().split(/\s+/);
