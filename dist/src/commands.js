@@ -149,7 +149,7 @@ async function handleAchievements(apiKey) {
     const data = await xblFetch(apiKey, "/achievements");
     const titles = data.titles ?? [];
     if (titles.length === 0)
-        return "No achievement titles found.";
+        return `No achievement titles found. (data keys: ${Object.keys(data ?? {}).join(", ") || "none"})`;
     const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
     const lines = [
         `**Achievements** — ${titles.length} titles, ${totalScore.toLocaleString()}G`,

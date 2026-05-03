@@ -144,7 +144,7 @@ async function handleSearch(apiKey: string, gamertag: string): Promise<string> {
 async function handleAchievements(apiKey: string): Promise<string> {
   const data = await xblFetch<{ titles: GameTitle[] }>(apiKey, "/achievements");
   const titles = data.titles ?? [];
-  if (titles.length === 0) return "No achievement titles found.";
+  if (titles.length === 0) return `No achievement titles found. (data keys: ${Object.keys(data ?? {}).join(", ") || "none"})`;
 
   const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
   const lines = [
