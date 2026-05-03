@@ -148,7 +148,7 @@ async function handleSearch(apiKey, gamertag) {
 async function handleAchievements(apiKey) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = await xblFetch(apiKey, "/achievements");
-    return `type=${typeof raw} null=${raw === null} undef=${raw === undefined} keys=${Object.keys(raw ?? {}).length} vals=${Object.values(raw ?? {}).length} first_key=${Object.keys(raw ?? {})[0]}`;
+    return `type=${typeof raw} len=${String(raw).length} val=${String(raw).substring(0, 120)}`;
     let titles;
     if (Array.isArray(raw)) {
         titles = raw;
