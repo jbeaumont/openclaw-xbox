@@ -6,60 +6,64 @@ An [OpenClaw](https://github.com/openclaw/openclaw) plugin that brings Xbox Live
 
 ---
 
-## Requirements
+## Prerequisites
 
-- A running OpenClaw gateway (`>=2026.3.24-beta.2`)
-- A free [xbl.io](https://xbl.io) API key (150 requests/hour on the free tier)
+- OpenClaw gateway `>=2026.3.24-beta.2`
+- An [xbl.io](https://xbl.io) account (free tier: 150 requests/hour)
 
 ---
 
-## Installation
+## Setup
+
+### 1. Install the plugin
 
 ```bash
 openclaw plugins install git:github.com/jbeaumont/openclaw-xbox
 ```
 
----
+### 2. Get an xbl.io API key
 
-## Configuration
+1. Go to [xbl.io](https://xbl.io) and sign in with your Microsoft account — this links your Xbox Live account
+2. Navigate to **API Keys** in the dashboard
+3. Copy your key
 
-Add the following to your OpenClaw config (e.g. `~/.openclaw/config.json`):
+### 3. Configure the API key
 
-```json
-{
-  "plugins": {
-    "entries": {
-      "openclaw-xbox": {
-        "enabled": true,
-        "config": {
-          "apiKey": "YOUR_XBL_IO_API_KEY"
-        },
-        "tools": {
-          "allow": [
-            "xbox_my_profile",
-            "xbox_search_player",
-            "xbox_friends_presence",
-            "xbox_player_presence",
-            "xbox_my_achievements",
-            "xbox_player_achievements",
-            "xbox_gamepass_all",
-            "xbox_gamepass_pc",
-            "xbox_gamepass_ea_play",
-            "xbox_sessions",
-            "xbox_session_config"
-          ]
-        }
-      }
-    }
-  }
-}
+```bash
+openclaw config set plugins.entries.openclaw-xbox.config.apiKey YOUR_KEY_HERE
 ```
 
-All tools are **optional** — only tools listed under `tools.allow` will be available to the agent. Add only the ones you want.
+### 4. Verify the connection
+
+```
+/xbox setup
+```
+
+This will confirm your key is valid and show your gamertag and gamerscore. If anything is wrong it will tell you what to check.
 
 ---
 
-## Tools
+## Commands
+
+Once configured, use `/xbox` directly in your OpenClaw chat:
+
+| Command | Description |
+|---|---|
+| `/xbox setup` | Verify your API key and connection |
+| `/xbox profile` | Your Xbox profile and gamerscore |
+| `/xbox friends` | Friends list with online status |
+| `/xbox search <gamertag>` | Look up any player by gamertag |
+| `/xbox achievements` | Your achievements across all titles |
+| `/xbox gamepass` | Full Game Pass catalog |
+| `/xbox gamepass pc` | PC Game Pass titles |
+| `/xbox gamepass ea` | EA Play titles |
+| `/xbox sessions` | Active sessions and party members |
+
+---
+
+## Agent Tools
+
+The plugin also registers tools that the AI agent can use automatically. All 11 tools are allowlisted on install — no extra config needed.
 
 ### Identity
 | Tool | Description |
