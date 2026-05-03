@@ -8,11 +8,11 @@ export function registerPresenceTools(api, apiKey) {
         description: "Get the online presence of all Xbox Live friends — who is online, what they are playing, and on which device.",
         parameters: EmptyParamSchema,
         async execute() {
-            const data = await xblFetch(apiKey, "/presence");
-            const records = data.presenceRecords ?? [];
-            if (records.length === 0)
-                return toolResult("No friends presence data available.");
-            return toolResult(JSON.stringify(records, null, 2));
+            const data = await xblFetch(apiKey, "/friends");
+            const people = data.people ?? [];
+            if (people.length === 0)
+                return toolResult("No friends found.");
+            return toolResult(JSON.stringify(people, null, 2));
         },
     }, { optional: true });
     api.registerTool({
@@ -21,10 +21,7 @@ export function registerPresenceTools(api, apiKey) {
         parameters: XuidParamSchema,
         async execute(_id, { xuid }) {
             const data = await xblFetch(apiKey, `/${encodeURIComponent(xuid)}/presence`);
-            const records = data.presenceRecords ?? [];
-            if (records.length === 0)
-                return toolResult(`No presence data found for XUID: ${xuid}`);
-            return toolResult(JSON.stringify(records[0], null, 2));
+            return toolResult(JSON.stringify(data, null, 2));
         },
     }, { optional: true });
 }

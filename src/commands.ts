@@ -1,5 +1,5 @@
 import { xblFetch, XblApiError } from "./client.js";
-import type { Profile, Presence, Achievement, GamePassTitle, Session } from "./types.js";
+import type { Profile, Friend, Achievement, GamePassTitle, Session } from "./types.js";
 import { getSetting } from "./types.js";
 
 const HELP_TEXT = `
@@ -31,11 +31,10 @@ function formatProfile(p: Profile): string {
   return lines.join("\n");
 }
 
-function formatPresenceRecord(p: Presence): string {
-  const status = p.state === "Online" ? "🟢" : "⚫";
-  let line = `${status} \`${p.xuid}\``;
-  if (p.lastSeen?.titleName) line += ` — ${p.lastSeen.titleName}`;
-  if (p.lastSeen?.deviceType) line += ` (${p.lastSeen.deviceType})`;
+function formatFriend(f: Friend): string {
+  const status = f.presenceState === "Online" ? "🟢" : "⚫";
+  let line = `${status} **${f.gamertag}**`;
+  if (f.presenceText) line += ` — ${f.presenceText}`;
   return line;
 }
 
@@ -112,20 +111,16 @@ async function handleProfile(apiKey: string): Promise<string> {
 }
 
 async function handleFriends(apiKey: string): Promise<string> {
-  const data = await xblFetch<{ presenceRecords: Presence[] }>(apiKey, "/presence");
-  const records = data.presenceRecords ?? [];
-  if (records.length === 0) return "No friends presence data available.";
+  const data = await xblFetch<{ people: Friend[] }>(apiKey, "/friends");
+  const people = data.people ?? [];
+  if (people.length === 0) return "No friends found.";
 
-  const online = records.filter(r => r.state === "Online");
-  const offline = records.filter(r => r.state !== "Online");
+  const online = people.filter(f => f.presenceState === "Online");
+  const offline = people.filter(f => f.presenceState !== "Online");
 
   const lines: string[] = [`**Friends** (${online.length} online, ${offline.length} offline)`];
-  if (online.length) {
-    lines.push("", ...online.map(formatPresenceRecord));
-  }
-  if (offline.length) {
-    lines.push("", ...offline.map(formatPresenceRecord));
-  }
+  if (online.length) lines.push("", ...online.map(formatFriend));
+  if (offline.length) lines.push("", ...offline.map(formatFriend));
   return lines.join("\n");
 }
 

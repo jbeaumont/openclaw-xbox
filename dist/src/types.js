@@ -8,15 +8,15 @@ export const ProfileSchema = Type.Object({
 export function getSetting(profile, settingId) {
     return profile.settings.find(s => s.id === settingId)?.value;
 }
-export const PresenceSchema = Type.Object({
+export const FriendSchema = Type.Object({
     xuid: Type.String(),
-    state: Type.String(),
-    lastSeen: Type.Optional(Type.Object({
-        deviceType: Type.Optional(Type.String()),
-        titleId: Type.Optional(Type.String()),
-        titleName: Type.Optional(Type.String()),
-        timestamp: Type.Optional(Type.String()),
-    })),
+    gamertag: Type.String(),
+    modernGamertag: Type.Optional(Type.String()),
+    gamerScore: Type.Optional(Type.String()),
+    presenceState: Type.Optional(Type.String()),
+    presenceText: Type.Optional(Type.String()),
+    isFavorite: Type.Optional(Type.Boolean()),
+    displayPicRaw: Type.Optional(Type.String()),
 });
 export const AchievementSchema = Type.Object({
     id: Type.String(),
