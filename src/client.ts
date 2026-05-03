@@ -38,5 +38,6 @@ export async function xblFetch<T>(
     throw new XblApiError(res.status, message);
   }
 
-  return res.json() as Promise<T>;
+  const json = await res.json() as { content?: T; code?: number };
+  return (json.content ?? json) as T;
 }

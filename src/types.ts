@@ -3,15 +3,15 @@ import { Type, Static } from "@sinclair/typebox";
 // --- Shared primitives ---
 
 export const ProfileSchema = Type.Object({
-  xuid: Type.String(),
-  gamertag: Type.String(),
-  gamerscore: Type.Optional(Type.Number()),
-  accountTier: Type.Optional(Type.String()),
-  displayPicRaw: Type.Optional(Type.String()),
-  bio: Type.Optional(Type.String()),
-  location: Type.Optional(Type.String()),
+  id: Type.String(),
+  settings: Type.Array(Type.Object({ id: Type.String(), value: Type.String() })),
+  isSponsoredUser: Type.Optional(Type.Boolean()),
 });
 export type Profile = Static<typeof ProfileSchema>;
+
+export function getSetting(profile: Profile, settingId: string): string | undefined {
+  return profile.settings.find(s => s.id === settingId)?.value;
+}
 
 export const PresenceSchema = Type.Object({
   xuid: Type.String(),

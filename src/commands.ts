@@ -1,5 +1,6 @@
 import { xblFetch, XblApiError } from "./client.js";
 import type { Profile, Presence, Achievement, GamePassTitle, Session } from "./types.js";
+import { getSetting } from "./types.js";
 
 const HELP_TEXT = `
 **Xbox Live** — available commands:
@@ -16,12 +17,17 @@ const HELP_TEXT = `
 `.trim();
 
 function formatProfile(p: Profile): string {
-  const lines = [`**${p.gamertag}**`];
-  if (p.gamerscore !== undefined) lines.push(`Gamerscore: ${p.gamerscore.toLocaleString()}`);
-  if (p.accountTier) lines.push(`Tier: ${p.accountTier}`);
-  if (p.location) lines.push(`Location: ${p.location}`);
-  if (p.bio) lines.push(`Bio: ${p.bio}`);
-  lines.push(`XUID: \`${p.xuid}\``);
+  const gamertag = getSetting(p, "Gamertag") ?? getSetting(p, "ModernGamertag") ?? "Unknown";
+  const gamerscore = getSetting(p, "Gamerscore");
+  const tier = getSetting(p, "AccountTier");
+  const location = getSetting(p, "Location");
+  const bio = getSetting(p, "Bio");
+  const lines = [`**${gamertag}**`];
+  if (gamerscore) lines.push(`Gamerscore: ${parseInt(gamerscore).toLocaleString()}`);
+  if (tier) lines.push(`Tier: ${tier}`);
+  if (location) lines.push(`Location: ${location}`);
+  if (bio) lines.push(`Bio: ${bio}`);
+  lines.push(`XUID: \`${p.id}\``);
   return lines.join("\n");
 }
 
@@ -73,11 +79,13 @@ async function handleSetup(apiKey: string | undefined): Promise<string> {
     const data = await xblFetch<{ profileUsers: Profile[] }>(apiKey, "/account");
     const profile = data.profileUsers?.[0];
     if (!profile) throw new Error("No profile returned");
+    const gamertag = getSetting(profile, "Gamertag") ?? getSetting(profile, "ModernGamertag") ?? "Unknown";
+    const gamerscore = parseInt(getSetting(profile, "Gamerscore") ?? "0");
     return [
       "**Xbox Live Setup**",
       "",
       `✅ API key configured`,
-      `✅ Connection verified — signed in as **${profile.gamertag}** (G: ${(profile.gamerscore ?? 0).toLocaleString()})`,
+      `✅ Connection verified — signed in as **${gamertag}** (G: ${gamerscore.toLocaleString()})`,
       "",
       "All 11 tools are active. Type `/xbox help` to see available commands.",
     ].join("\n");

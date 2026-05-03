@@ -30,5 +30,6 @@ export async function xblFetch(apiKey, path, options = {}) {
         }
         throw new XblApiError(res.status, message);
     }
-    return res.json();
+    const json = await res.json();
+    return (json.content ?? json);
 }

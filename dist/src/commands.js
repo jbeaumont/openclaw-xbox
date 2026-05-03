@@ -1,4 +1,5 @@
 import { xblFetch, XblApiError } from "./client.js";
+import { getSetting } from "./types.js";
 const HELP_TEXT = `
 **Xbox Live** — available commands:
 
@@ -13,16 +14,21 @@ const HELP_TEXT = `
   /xbox sessions            Active sessions and party members
 `.trim();
 function formatProfile(p) {
-    const lines = [`**${p.gamertag}**`];
-    if (p.gamerscore !== undefined)
-        lines.push(`Gamerscore: ${p.gamerscore.toLocaleString()}`);
-    if (p.accountTier)
-        lines.push(`Tier: ${p.accountTier}`);
-    if (p.location)
-        lines.push(`Location: ${p.location}`);
-    if (p.bio)
-        lines.push(`Bio: ${p.bio}`);
-    lines.push(`XUID: \`${p.xuid}\``);
+    const gamertag = getSetting(p, "Gamertag") ?? getSetting(p, "ModernGamertag") ?? "Unknown";
+    const gamerscore = getSetting(p, "Gamerscore");
+    const tier = getSetting(p, "AccountTier");
+    const location = getSetting(p, "Location");
+    const bio = getSetting(p, "Bio");
+    const lines = [`**${gamertag}**`];
+    if (gamerscore)
+        lines.push(`Gamerscore: ${parseInt(gamerscore).toLocaleString()}`);
+    if (tier)
+        lines.push(`Tier: ${tier}`);
+    if (location)
+        lines.push(`Location: ${location}`);
+    if (bio)
+        lines.push(`Bio: ${bio}`);
+    lines.push(`XUID: \`${p.id}\``);
     return lines.join("\n");
 }
 function formatPresenceRecord(p) {
@@ -76,11 +82,13 @@ async function handleSetup(apiKey) {
         const profile = data.profileUsers?.[0];
         if (!profile)
             throw new Error("No profile returned");
+        const gamertag = getSetting(profile, "Gamertag") ?? getSetting(profile, "ModernGamertag") ?? "Unknown";
+        const gamerscore = parseInt(getSetting(profile, "Gamerscore") ?? "0");
         return [
             "**Xbox Live Setup**",
             "",
             `✅ API key configured`,
-            `✅ Connection verified — signed in as **${profile.gamertag}** (G: ${(profile.gamerscore ?? 0).toLocaleString()})`,
+            `✅ Connection verified — signed in as **${gamertag}** (G: ${gamerscore.toLocaleString()})`,
             "",
             "All 11 tools are active. Type `/xbox help` to see available commands.",
         ].join("\n");
