@@ -9,7 +9,7 @@ export function registerSessionTools(api, apiKey) {
         parameters: EmptyParamSchema,
         async execute() {
             const data = await xblFetch(apiKey, "/session");
-            const sessions = data.sessions ?? [];
+            const sessions = data.results ?? [];
             if (sessions.length === 0)
                 return toolResult("No active sessions found.");
             return toolResult(JSON.stringify(sessions, null, 2));

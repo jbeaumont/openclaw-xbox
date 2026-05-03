@@ -18,16 +18,20 @@ export const FriendSchema = Type.Object({
     isFavorite: Type.Optional(Type.Boolean()),
     displayPicRaw: Type.Optional(Type.String()),
 });
-export const AchievementSchema = Type.Object({
-    id: Type.String(),
+export const GameTitleSchema = Type.Object({
+    titleId: Type.String(),
     name: Type.String(),
-    description: Type.Optional(Type.String()),
-    isUnlocked: Type.Optional(Type.Boolean()),
-    timeUnlocked: Type.Optional(Type.String()),
-    gamerscore: Type.Optional(Type.Number()),
-    rarity: Type.Optional(Type.Object({
-        currentCategory: Type.Optional(Type.String()),
-        currentPercentage: Type.Optional(Type.Number()),
+    type: Type.Optional(Type.String()),
+    devices: Type.Optional(Type.Array(Type.String())),
+    achievement: Type.Optional(Type.Object({
+        currentAchievements: Type.Optional(Type.Number()),
+        totalAchievements: Type.Optional(Type.Number()),
+        currentGamerscore: Type.Optional(Type.Number()),
+        totalGamerscore: Type.Optional(Type.Number()),
+        progressPercentage: Type.Optional(Type.Number()),
+    })),
+    titleHistory: Type.Optional(Type.Object({
+        lastTimePlayed: Type.Optional(Type.String()),
     })),
 });
 export const GamePassTitleSchema = Type.Object({

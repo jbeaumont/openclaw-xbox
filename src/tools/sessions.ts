@@ -10,8 +10,8 @@ export function registerSessionTools(api: any, apiKey: string) {
       description: "List the current Xbox Live sessions and parties — active multiplayer sessions, members, and title being played.",
       parameters: EmptyParamSchema,
       async execute() {
-        const data = await xblFetch<{ sessions: Session[] }>(apiKey, "/session");
-        const sessions = data.sessions ?? [];
+        const data = await xblFetch<{ results: Session[] }>(apiKey, "/session");
+        const sessions = data.results ?? [];
         if (sessions.length === 0) return toolResult("No active sessions found.");
         return toolResult(JSON.stringify(sessions, null, 2));
       },

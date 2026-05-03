@@ -137,19 +137,25 @@ async function handleSearch(apiKey, gamertag) {
 }
 async function handleAchievements(apiKey) {
     const data = await xblFetch(apiKey, "/achievements");
-    const achievements = data.achievements ?? [];
-    if (achievements.length === 0)
-        return "No achievements found.";
-    const unlocked = achievements.filter(a => a.isUnlocked);
-    const total = achievements.length;
-    const score = unlocked.reduce((sum, a) => sum + (a.gamerscore ?? 0), 0);
+    const titles = data.titles ?? [];
+    if (titles.length === 0)
+        return "No achievement titles found.";
+    const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
     const lines = [
-        `**Achievements** — ${unlocked.length}/${total} unlocked, ${score.toLocaleString()}G`,
+        `**Achievements** — ${titles.length} titles, ${totalScore.toLocaleString()}G`,
         "",
-        ...unlocked.slice(0, 20).map(a => `✅ **${a.name}**${a.gamerscore ? ` (${a.gamerscore}G)` : ""}${a.description ? ` — ${a.description}` : ""}`),
+        ...titles.slice(0, 25).map(t => {
+            const a = t.achievement;
+            let line = `• **${t.name}**`;
+            if (a)
+                line += ` — ${a.currentAchievements ?? 0}/${a.totalAchievements || "?"} achievements, ${(a.currentGamerscore ?? 0).toLocaleString()}/${(a.totalGamerscore ?? 0).toLocaleString()}G`;
+            if (a?.progressPercentage != null)
+                line += ` (${a.progressPercentage}%)`;
+            return line;
+        }),
     ];
-    if (unlocked.length > 20)
-        lines.push(`…and ${unlocked.length - 20} more.`);
+    if (titles.length > 25)
+        lines.push(`…and ${titles.length - 25} more.`);
     return lines.join("\n");
 }
 async function handleGamePass(apiKey, sub) {
@@ -176,7 +182,7 @@ async function handleGamePass(apiKey, sub) {
 }
 async function handleSessions(apiKey) {
     const data = await xblFetch(apiKey, "/session");
-    const sessions = data.sessions ?? [];
+    const sessions = data.results ?? [];
     if (sessions.length === 0)
         return "No active sessions found.";
     return [
