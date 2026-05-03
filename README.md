@@ -49,11 +49,12 @@ Once configured, use `/xbox` directly in your OpenClaw chat:
 
 | Command | Description |
 |---|---|
+| `/xbox help` | List all available commands |
 | `/xbox setup` | Verify your API key and connection |
 | `/xbox profile` | Your Xbox profile and gamerscore |
 | `/xbox friends` | Friends list with online status |
 | `/xbox search <gamertag>` | Look up any player by gamertag |
-| `/xbox achievements` | Your achievements across all titles |
+| `/xbox achievements` | Your achievement progress across all titles |
 | `/xbox gamepass` | Full Game Pass catalog |
 | `/xbox gamepass pc` | PC Game Pass titles |
 | `/xbox gamepass ea` | EA Play titles |
