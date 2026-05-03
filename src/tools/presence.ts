@@ -1,8 +1,9 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, XuidParamSchema, Presence } from "../types.js";
+import { toolResult } from "../result.js";
 
-export function registerPresenceTools(api: OpenClawPluginApi, apiKey: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerPresenceTools(api: any, apiKey: string) {
   api.registerTool(
     {
       name: "xbox_friends_presence",
@@ -11,13 +12,8 @@ export function registerPresenceTools(api: OpenClawPluginApi, apiKey: string) {
       async execute() {
         const data = await xblFetch<{ presenceRecords: Presence[] }>(apiKey, "/presence");
         const records = data.presenceRecords ?? [];
-        if (records.length === 0) return { content: [{ type: "text", text: "No friends presence data available." }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(records, null, 2),
-          }],
-        };
+        if (records.length === 0) return toolResult("No friends presence data available.");
+        return toolResult(JSON.stringify(records, null, 2));
       },
     },
     { optional: true }
@@ -28,19 +24,14 @@ export function registerPresenceTools(api: OpenClawPluginApi, apiKey: string) {
       name: "xbox_player_presence",
       description: "Get the current online presence for a specific Xbox Live player by their XUID.",
       parameters: XuidParamSchema,
-      async execute(_id, { xuid }) {
+      async execute(_id: string, { xuid }: { xuid: string }) {
         const data = await xblFetch<{ presenceRecords: Presence[] }>(
           apiKey,
           `/${encodeURIComponent(xuid)}/presence`
         );
         const records = data.presenceRecords ?? [];
-        if (records.length === 0) return { content: [{ type: "text", text: `No presence data found for XUID: ${xuid}` }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(records[0], null, 2),
-          }],
-        };
+        if (records.length === 0) return toolResult(`No presence data found for XUID: ${xuid}`);
+        return toolResult(JSON.stringify(records[0], null, 2));
       },
     },
     { optional: true }

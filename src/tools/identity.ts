@@ -1,9 +1,11 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, GamertagParamSchema, Profile } from "../types.js";
+import { toolResult } from "../result.js";
 
-export function registerIdentityTools(api: OpenClawPluginApi, apiKey: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerIdentityTools(api: any, apiKey: string) {
   api.registerTool(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     {
       name: "xbox_my_profile",
       description: "Get the authenticated Xbox Live user's own profile — gamertag, XUID, gamerscore, account tier, bio, and location.",
@@ -11,13 +13,8 @@ export function registerIdentityTools(api: OpenClawPluginApi, apiKey: string) {
       async execute() {
         const data = await xblFetch<{ profileUsers: Profile[] }>(apiKey, "/account");
         const profile = data.profileUsers?.[0];
-        if (!profile) return { content: [{ type: "text", text: "No profile data returned." }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(profile, null, 2),
-          }],
-        };
+        if (!profile) return toolResult("No profile data returned.");
+        return toolResult(JSON.stringify(profile, null, 2));
       },
     },
     { optional: true }
@@ -28,19 +25,14 @@ export function registerIdentityTools(api: OpenClawPluginApi, apiKey: string) {
       name: "xbox_search_player",
       description: "Look up an Xbox Live player by gamertag. Returns their XUID, gamerscore, account tier, and profile details.",
       parameters: GamertagParamSchema,
-      async execute(_id, { gamertag }) {
+      async execute(_id: string, { gamertag }: { gamertag: string }) {
         const data = await xblFetch<{ profileUsers: Profile[] }>(
           apiKey,
           `/search/${encodeURIComponent(gamertag)}`
         );
         const profile = data.profileUsers?.[0];
-        if (!profile) return { content: [{ type: "text", text: `No player found for gamertag: ${gamertag}` }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(profile, null, 2),
-          }],
-        };
+        if (!profile) return toolResult(`No player found for gamertag: ${gamertag}`);
+        return toolResult(JSON.stringify(profile, null, 2));
       },
     },
     { optional: true }

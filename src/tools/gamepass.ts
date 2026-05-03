@@ -1,9 +1,10 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, GamePassTitle } from "../types.js";
+import { toolResult } from "../result.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function makeGamePassTool(
-  api: OpenClawPluginApi,
+  api: any,
   apiKey: string,
   name: string,
   description: string,
@@ -17,20 +18,16 @@ function makeGamePassTool(
       async execute() {
         const data = await xblFetch<{ titles: GamePassTitle[] }>(apiKey, path);
         const titles = data.titles ?? [];
-        if (titles.length === 0) return { content: [{ type: "text", text: "No titles found." }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(titles, null, 2),
-          }],
-        };
+        if (titles.length === 0) return toolResult("No titles found.");
+        return toolResult(JSON.stringify(titles, null, 2));
       },
     },
     { optional: true }
   );
 }
 
-export function registerGamePassTools(api: OpenClawPluginApi, apiKey: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerGamePassTools(api: any, apiKey: string) {
   makeGamePassTool(
     api, apiKey,
     "xbox_gamepass_all",

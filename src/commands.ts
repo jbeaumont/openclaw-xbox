@@ -1,4 +1,3 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { xblFetch, XblApiError } from "./client.js";
 import type { Profile, Presence, Achievement, GamePassTitle, Session } from "./types.js";
 
@@ -187,13 +186,14 @@ async function handleSessions(apiKey: string): Promise<string> {
   ].join("\n");
 }
 
-export function registerCommands(api: OpenClawPluginApi, apiKey: string | undefined) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerCommands(api: any, apiKey: string | undefined) {
   api.registerCommand({
     name: "xbox",
     description: "Xbox Live — /xbox help for all commands",
     acceptsArgs: true,
     requireAuth: false,
-    handler: async (ctx) => {
+    handler: async (ctx: { args?: string }) => {
       const args = ctx.args ?? "";
       const parts = args.trim().split(/\s+/);
       const sub = parts[0]?.toLowerCase() ?? "";

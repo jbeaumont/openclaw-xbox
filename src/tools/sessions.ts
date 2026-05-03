@@ -1,8 +1,9 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, Session } from "../types.js";
+import { toolResult } from "../result.js";
 
-export function registerSessionTools(api: OpenClawPluginApi, apiKey: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerSessionTools(api: any, apiKey: string) {
   api.registerTool(
     {
       name: "xbox_sessions",
@@ -11,13 +12,8 @@ export function registerSessionTools(api: OpenClawPluginApi, apiKey: string) {
       async execute() {
         const data = await xblFetch<{ sessions: Session[] }>(apiKey, "/session");
         const sessions = data.sessions ?? [];
-        if (sessions.length === 0) return { content: [{ type: "text", text: "No active sessions found." }] };
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(sessions, null, 2),
-          }],
-        };
+        if (sessions.length === 0) return toolResult("No active sessions found.");
+        return toolResult(JSON.stringify(sessions, null, 2));
       },
     },
     { optional: true }
@@ -30,12 +26,7 @@ export function registerSessionTools(api: OpenClawPluginApi, apiKey: string) {
       parameters: EmptyParamSchema,
       async execute() {
         const data = await xblFetch<unknown>(apiKey, "/session/config");
-        return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(data, null, 2),
-          }],
-        };
+        return toolResult(JSON.stringify(data, null, 2));
       },
     },
     { optional: true }

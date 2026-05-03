@@ -12,7 +12,9 @@ export default definePluginEntry({
   description: "Xbox Live tools via xbl.io — profiles, presence, achievements, Game Pass catalog, and sessions",
 
   register(api) {
-    const apiKey = api.config.get<string>("apiKey") || undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pluginCfg = (api.config as any)?.plugins?.entries?.["openclaw-xbox"]?.config;
+    const apiKey = (pluginCfg?.apiKey as string | undefined) || undefined;
 
     // Commands are always registered — /xbox setup works even without a key
     registerCommands(api, apiKey);

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:xbl.io)",
+      "WebFetch(domain:docs.openclaw.ai)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.xbl.io)",
+      "WebFetch(domain:xbox-webapi-ex.readthedocs.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git init *)",
+      "Bash(gh repo *)",
+      "PowerShell(gh --version)",
+      "Bash(gh api *)",
+      "Bash(python3 -c \"import sys,json,base64; d=json.load\\(sys.stdin\\); print\\(base64.b64decode\\(d['content']\\).decode\\(\\)\\)\")",
+      "WebFetch(domain:advenboost.com)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:app.unpkg.com)",
+      "WebFetch(domain:lumadock.com)",
+      "WebFetch(domain:open-claw.bot)",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/command-surface.js\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/native-command-registry.js\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/command-surface.d.ts\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/src/plugin-sdk/command-surface.js\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/?meta\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/src/plugin-sdk/plugin-entry.d.ts\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/src/plugins/types.d.ts\")",
+      "Bash(curl -s \"https://unpkg.com/openclaw@2026.5.2/dist/plugin-sdk/src/auto-reply/reply-payload.d.ts\")",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
+    ]
+  }
+}
