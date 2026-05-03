@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-API_KEY="7cf19e96-c40b-48ac-876c-6aac9be0f753"
+API_KEY="${XBL_API_KEY:-}"
+
+if [[ -z "$API_KEY" ]]; then
+  echo "Error: set XBL_API_KEY before running, e.g.:"
+  echo "  XBL_API_KEY=your-key ./reinstall.sh"
+  exit 1
+fi
 
 echo "→ Installing plugin..."
 openclaw plugins install git:github.com/jbeaumont/openclaw-xbox
