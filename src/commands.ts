@@ -160,15 +160,19 @@ async function handleAchievements(apiKey: string): Promise<string> {
   const lines = [
     `**Achievements** — ${titles.length} titles, ${totalScore.toLocaleString()}G`,
     "",
-    ...titles.slice(0, 25).map(t => {
+    ...titles.filter(t => (t.achievement?.currentGamerscore ?? 0) > 0).slice(0, 25).map(t => {
       const a = t.achievement;
       let line = `• **${t.name}**`;
-      if (a) line += ` — ${a.currentAchievements ?? 0}/${a.totalAchievements || "?"} achievements, ${(a.currentGamerscore ?? 0).toLocaleString()}/${(a.totalGamerscore ?? 0).toLocaleString()}G`;
+      if (a) {
+        const total = a.totalAchievements ? `/${a.totalAchievements}` : "";
+        line += ` — ${a.currentAchievements ?? 0}${total} achievements, ${(a.currentGamerscore ?? 0).toLocaleString()}/${(a.totalGamerscore ?? 0).toLocaleString()}G`;
+      }
       if (a?.progressPercentage != null) line += ` (${a.progressPercentage}%)`;
       return line;
     }),
   ];
-  if (titles.length > 25) lines.push(`…and ${titles.length - 25} more.`);
+  const withProgress = titles.filter(t => (t.achievement?.currentGamerscore ?? 0) > 0);
+  if (withProgress.length > 25) lines.push(`…and ${withProgress.length - 25} more with progress.`);
   return lines.join("\n");
 }
 
