@@ -144,12 +144,16 @@ async function handleSearch(apiKey: string, gamertag: string): Promise<string> {
 async function handleAchievements(apiKey: string): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = await xblFetch<any>(apiKey, "/achievements");
-  const isArr = Array.isArray(raw);
-  const keys = Object.keys(raw ?? {}).slice(0, 6).join(",");
-  const titlesVal = raw?.titles;
-  const titlesIsArr = Array.isArray(titlesVal);
-  return `isArr=${isArr} keys=[${keys}] titlesType=${typeof titlesVal} titlesIsArr=${titlesIsArr} titlesLen=${titlesIsArr ? titlesVal.length : "n/a"}`;
-  const titles: GameTitle[] = isArr ? raw : (titlesVal ?? []);
+  let titles: GameTitle[];
+  if (Array.isArray(raw)) {
+    titles = raw;
+  } else if (raw?.titles && Array.isArray(raw.titles)) {
+    titles = raw.titles;
+  } else if (raw && typeof raw === "object") {
+    titles = Object.values(raw) as GameTitle[];
+  } else {
+    titles = [];
+  }
   if (titles.length === 0) return "No achievement titles found.";
 
   const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
@@ -177,8 +181,10 @@ async function handleGamePass(apiKey: string, sub: string): Promise<string> {
   const target = pathMap[sub];
   if (!target) return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
 
-  const titles = await xblFetch<GamePassTitle[]>(apiKey, target.path);
-  if (!Array.isArray(titles) || titles.length === 0) return `No titles found in ${target.label}.`;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await xblFetch<any>(apiKey, target.path);
+  const titles: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
+  if (titles.length === 0) return `No titles found in ${target.label}.`;
 
   const lines = [
     `**${target.label}** — ${titles.length} titles`,

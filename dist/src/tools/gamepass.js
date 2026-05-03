@@ -8,8 +8,10 @@ function makeGamePassTool(api, apiKey, name, description, path) {
         description,
         parameters: EmptyParamSchema,
         async execute() {
-            const titles = await xblFetch(apiKey, path);
-            if (!Array.isArray(titles) || titles.length === 0)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const raw = await xblFetch(apiKey, path);
+            const titles = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
+            if (titles.length === 0)
                 return toolResult("No titles found.");
             return toolResult(JSON.stringify(titles, null, 2));
         },

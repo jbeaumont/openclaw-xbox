@@ -148,12 +148,19 @@ async function handleSearch(apiKey, gamertag) {
 async function handleAchievements(apiKey) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = await xblFetch(apiKey, "/achievements");
-    const isArr = Array.isArray(raw);
-    const keys = Object.keys(raw ?? {}).slice(0, 6).join(",");
-    const titlesVal = raw?.titles;
-    const titlesIsArr = Array.isArray(titlesVal);
-    return `isArr=${isArr} keys=[${keys}] titlesType=${typeof titlesVal} titlesIsArr=${titlesIsArr} titlesLen=${titlesIsArr ? titlesVal.length : "n/a"}`;
-    const titles = isArr ? raw : (titlesVal ?? []);
+    let titles;
+    if (Array.isArray(raw)) {
+        titles = raw;
+    }
+    else if (raw?.titles && Array.isArray(raw.titles)) {
+        titles = raw.titles;
+    }
+    else if (raw && typeof raw === "object") {
+        titles = Object.values(raw);
+    }
+    else {
+        titles = [];
+    }
     if (titles.length === 0)
         return "No achievement titles found.";
     const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
@@ -183,8 +190,10 @@ async function handleGamePass(apiKey, sub) {
     const target = pathMap[sub];
     if (!target)
         return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
-    const titles = await xblFetch(apiKey, target.path);
-    if (!Array.isArray(titles) || titles.length === 0)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await xblFetch(apiKey, target.path);
+    const titles = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
+    if (titles.length === 0)
         return `No titles found in ${target.label}.`;
     const lines = [
         `**${target.label}** — ${titles.length} titles`,

@@ -10,8 +10,9 @@ export function registerAchievementTools(api: any, apiKey: string) {
       description: "Get the authenticated user's Xbox Live achievement progress across all titles — gamerscore earned, achievements unlocked, and progress percentage per title.",
       parameters: EmptyParamSchema,
       async execute() {
-        const raw = await xblFetch<GameTitle[] | { titles: GameTitle[] }>(apiKey, "/achievements");
-        const titles = Array.isArray(raw) ? raw : (raw.titles ?? []);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const raw = await xblFetch<any>(apiKey, "/achievements");
+        const titles: GameTitle[] = Array.isArray(raw) ? raw : (raw?.titles && Array.isArray(raw.titles)) ? raw.titles : (raw && typeof raw === "object" ? Object.values(raw) : []);
         if (titles.length === 0) return toolResult("No achievement titles found.");
         return toolResult(JSON.stringify(titles, null, 2));
       },
