@@ -144,7 +144,6 @@ async function handleSearch(apiKey: string, gamertag: string): Promise<string> {
 async function handleAchievements(apiKey: string): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = await xblFetch<any>(apiKey, "/achievements");
-  return `type=${typeof raw} len=${String(raw).length} val=${String(raw).substring(0, 120)}`;
   let titles: GameTitle[];
   if (Array.isArray(raw)) {
     titles = raw;
@@ -184,15 +183,18 @@ async function handleGamePass(apiKey: string, sub: string): Promise<string> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = await xblFetch<any>(apiKey, target.path);
-  const titles: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
-  if (titles.length === 0) return `No titles found in ${target.label}.`;
+  const all: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
+  const titled = all.filter(t => t.title);
+  const idOnly = all.length - titled.length;
+  if (all.length === 0) return `No titles found in ${target.label}.`;
 
   const lines = [
-    `**${target.label}** — ${titles.length} titles`,
+    `**${target.label}** — ${all.length} titles`,
     "",
-    ...titles.slice(0, 30).map(formatGamePassTitle),
+    ...titled.slice(0, 30).map(formatGamePassTitle),
   ];
-  if (titles.length > 30) lines.push(`…and ${titles.length - 30} more.`);
+  if (idOnly > 0) lines.push(`…plus ${idOnly} more titles by product ID.`);
+  else if (titled.length > 30) lines.push(`…and ${titled.length - 30} more.`);
   return lines.join("\n");
 }
 

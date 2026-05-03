@@ -148,7 +148,6 @@ async function handleSearch(apiKey, gamertag) {
 async function handleAchievements(apiKey) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = await xblFetch(apiKey, "/achievements");
-    return `type=${typeof raw} len=${String(raw).length} val=${String(raw).substring(0, 120)}`;
     let titles;
     if (Array.isArray(raw)) {
         titles = raw;
@@ -193,16 +192,20 @@ async function handleGamePass(apiKey, sub) {
         return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = await xblFetch(apiKey, target.path);
-    const titles = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
-    if (titles.length === 0)
+    const all = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
+    const titled = all.filter(t => t.title);
+    const idOnly = all.length - titled.length;
+    if (all.length === 0)
         return `No titles found in ${target.label}.`;
     const lines = [
-        `**${target.label}** — ${titles.length} titles`,
+        `**${target.label}** — ${all.length} titles`,
         "",
-        ...titles.slice(0, 30).map(formatGamePassTitle),
+        ...titled.slice(0, 30).map(formatGamePassTitle),
     ];
-    if (titles.length > 30)
-        lines.push(`…and ${titles.length - 30} more.`);
+    if (idOnly > 0)
+        lines.push(`…plus ${idOnly} more titles by product ID.`);
+    else if (titled.length > 30)
+        lines.push(`…and ${titled.length - 30} more.`);
     return lines.join("\n");
 }
 async function handleSessions(apiKey) {

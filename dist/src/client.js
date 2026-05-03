@@ -15,6 +15,7 @@ export async function xblFetch(apiKey, path, options = {}) {
             "X-Authorization": apiKey,
             "Content-Type": "application/json",
             "Accept": "application/json",
+            "Accept-Language": "en-US",
         },
         body: body !== undefined ? JSON.stringify(body) : undefined,
     });
