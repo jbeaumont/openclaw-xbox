@@ -146,10 +146,10 @@ async function handleSearch(apiKey, gamertag) {
     return lines.join("\n");
 }
 async function handleAchievements(apiKey) {
-    const data = await xblFetch(apiKey, "/achievements");
-    const titles = data.titles ?? [];
+    const raw = await xblFetch(apiKey, "/achievements");
+    const titles = Array.isArray(raw) ? raw : (raw.titles ?? []);
     if (titles.length === 0)
-        return `No achievement titles found. (data keys: ${Object.keys(data ?? {}).join(", ") || "none"})`;
+        return "No achievement titles found.";
     const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
     const lines = [
         `**Achievements** — ${titles.length} titles, ${totalScore.toLocaleString()}G`,
