@@ -38,11 +38,7 @@ function formatFriend(f: Friend): string {
   return line;
 }
 
-function formatGamePassTitle(t: GamePassTitle): string {
-  let line = `• **${t.title}**`;
-  if (t.description) line += ` — ${t.description}`;
-  return line;
-}
+
 
 function formatSession(s: Session): string {
   const lines: string[] = [];
@@ -188,18 +184,13 @@ async function handleGamePass(apiKey: string, sub: string): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = await xblFetch<any>(apiKey, target.path);
   const all: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
-  const titled = all.filter(t => t.title);
-  const idOnly = all.length - titled.length;
   if (all.length === 0) return `No titles found in ${target.label}.`;
 
-  const lines = [
-    `**${target.label}** — ${all.length} titles`,
+  return [
+    `**${target.label}** — ${all.length} titles available`,
     "",
-    ...titled.slice(0, 30).map(formatGamePassTitle),
-  ];
-  if (idOnly > 0) lines.push(`…plus ${idOnly} more titles by product ID.`);
-  else if (titled.length > 30) lines.push(`…and ${titled.length - 30} more.`);
-  return lines.join("\n");
+    "_The catalog API returns product IDs only. Ask the agent to look up a specific game by name or ID._",
+  ].join("\n");
 }
 
 async function handleSessions(apiKey: string): Promise<string> {
