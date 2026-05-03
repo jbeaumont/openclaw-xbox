@@ -3,6 +3,7 @@
   "name": "Xbox Live",
   "description": "Xbox Live tools via xbl.io — look up profiles, presence, achievements, Game Pass catalog, and active sessions",
   "contracts": {
+    "commands": ["xbox"],
     "tools": [
       "xbox_my_profile",
       "xbox_search_player",

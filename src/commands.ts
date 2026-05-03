@@ -188,10 +188,12 @@ async function handleSessions(apiKey: string): Promise<string> {
 }
 
 export function registerCommands(api: OpenClawPluginApi, apiKey: string | undefined) {
-  api.registerCommand("xbox", {
+  api.registerCommand({
+    name: "xbox",
     description: "Xbox Live — /xbox help for all commands",
     acceptsArgs: true,
-    handler: async (args: string) => {
+    handler: async (ctx) => {
+      const args = ctx.args ?? "";
       const parts = args.trim().split(/\s+/);
       const sub = parts[0]?.toLowerCase() ?? "";
       const rest = parts.slice(1).join(" ");
