@@ -27,11 +27,14 @@ openclaw plugins install git:github.com/jbeaumont/openclaw-xbox
 2. Navigate to **API Keys** in the dashboard
 3. Copy your key
 
-### 3. Configure the API key
+### 3. Enable the plugin and configure the API key
 
 ```bash
+openclaw config set plugins.entries.openclaw-xbox.enabled true
 openclaw config set plugins.entries.openclaw-xbox.config.apiKey YOUR_KEY_HERE
 ```
+
+Then restart the gateway so it picks up the new plugin entry.
 
 ### 4. Verify the connection
 
@@ -64,7 +67,7 @@ Once configured, use `/xbox` directly in your OpenClaw chat:
 
 ## Agent Tools
 
-The plugin also registers tools that the AI agent can use automatically. All 11 tools are allowlisted on install — no extra config needed.
+The plugin also registers tools that the AI agent can use automatically once the plugin is enabled (step 3 above). No `tools.allow` changes needed — the tools are available to the agent by default.
 
 ### Identity
 | Tool | Description |
@@ -96,6 +99,21 @@ The plugin also registers tools that the AI agent can use automatically. All 11 
 |---|---|
 | `xbox_sessions` | Active sessions and party members |
 | `xbox_session_config` | Current session configuration and join settings |
+
+---
+
+## Troubleshooting
+
+**Agent says a tool isn't available**
+
+If you have a `tools.profile` configured, it may not include plugin tools. The cleanest fix is to replace the profile with an explicit allow list that covers both your existing tools and this plugin:
+
+```bash
+openclaw config unset tools.profile
+openclaw config set tools.allow '["group:openclaw", "openclaw-xbox"]'
+```
+
+`group:openclaw` covers all the same built-in tools as the `coding` profile. Then restart the gateway.
 
 ---
 
