@@ -1,4 +1,4 @@
-﻿import { xblFetch } from "../client.js";
+import { xblFetch } from "../client.js";
 import { EmptyParamSchema, XuidParamSchema, Friend } from "../types.js";
 import { toolResult } from "../result.js";
 
@@ -7,13 +7,33 @@ export function registerPresenceTools(api: any, apiKey: string) {
   api.registerTool(
     {
       name: "xbox_friends_presence",
-      description: "Get the online presence of all Xbox Live friends â€” who is online, what they are playing, and on which device.",
+      description: "Get the online presence of all Xbox Live friends -- who is online, what they are playing, and on which device.",
       parameters: EmptyParamSchema,
       async execute() {
-        const data = await xblFetch<{ people: Friend[] }>(apiKey, "/friends");
-        const people = data.people ?? [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const raw = await xblFetch<any>(apiKey, "/friends");
+        const rawPeople = raw?.people ?? raw;
+        const people: Friend[] = Array.isArray(rawPeople)
+          ? rawPeople
+          : rawPeople && typeof rawPeople === "object"
+          ? Object.values(rawPeople)
+          : [];
         if (people.length === 0) return toolResult("No friends found.");
-        return toolResult(JSON.stringify(people, null, 2));
+        const online = people.filter(p => p.presenceState === "Online");
+        const offline = people.filter(p => p.presenceState !== "Online");
+        const lines: string[] = [`Friends: ${online.length} online, ${offline.length} offline`];
+        for (const p of online) {
+          const tag = p.modernGamertag ?? p.gamertag ?? p.xuid;
+          lines.push(`  ${tag} -- ${p.presenceText ?? "Online"}`);
+        }
+        if (offline.length > 0) {
+          lines.push(`\nOffline (${offline.length}):`);
+          for (const p of offline) {
+            const tag = p.modernGamertag ?? p.gamertag ?? p.xuid;
+            lines.push(`  ${tag}${p.presenceText ? ` -- last seen: ${p.presenceText}` : ""}`);
+          }
+        }
+        return toolResult(lines.join("\n"));
       },
     }
   );
