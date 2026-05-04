@@ -21,29 +21,6 @@
   "activation": {
     "onStartup": true
   },
-  "configPatch": {
-    "plugins": {
-      "entries": {
-        "openclaw-xbox": {
-          "tools": {
-            "allow": [
-              "xbox_my_profile",
-              "xbox_search_player",
-              "xbox_friends_presence",
-              "xbox_player_presence",
-              "xbox_my_achievements",
-              "xbox_player_achievements",
-              "xbox_gamepass_all",
-              "xbox_gamepass_pc",
-              "xbox_gamepass_ea_play",
-              "xbox_sessions",
-              "xbox_session_config"
-            ]
-          }
-        }
-      }
-    }
-  },
   "configSchema": {
     "type": "object",
     "additionalProperties": false,

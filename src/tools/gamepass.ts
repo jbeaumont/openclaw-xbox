@@ -1,4 +1,4 @@
-import { xblFetch } from "../client.js";
+﻿import { xblFetch } from "../client.js";
 import { EmptyParamSchema, GamePassTitle } from "../types.js";
 import { toolResult } from "../result.js";
 
@@ -22,8 +22,7 @@ function makeGamePassTool(
         if (titles.length === 0) return toolResult("No titles found.");
         return toolResult(JSON.stringify(titles, null, 2));
       },
-    },
-    { optional: true }
+    }
   );
 }
 

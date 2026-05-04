@@ -1,4 +1,4 @@
-import { xblFetch } from "../client.js";
+﻿import { xblFetch } from "../client.js";
 import { EmptyParamSchema, Session } from "../types.js";
 import { toolResult } from "../result.js";
 
@@ -7,7 +7,7 @@ export function registerSessionTools(api: any, apiKey: string) {
   api.registerTool(
     {
       name: "xbox_sessions",
-      description: "List the current Xbox Live sessions and parties — active multiplayer sessions, members, and title being played.",
+      description: "List the current Xbox Live sessions and parties â€” active multiplayer sessions, members, and title being played.",
       parameters: EmptyParamSchema,
       async execute() {
         const data = await xblFetch<{ results: Session[] }>(apiKey, "/session");
@@ -15,20 +15,18 @@ export function registerSessionTools(api: any, apiKey: string) {
         if (sessions.length === 0) return toolResult("No active sessions found.");
         return toolResult(JSON.stringify(sessions, null, 2));
       },
-    },
-    { optional: true }
+    }
   );
 
   api.registerTool(
     {
       name: "xbox_session_config",
-      description: "Get the configuration details for the current Xbox Live session — settings, privacy, and join restrictions.",
+      description: "Get the configuration details for the current Xbox Live session â€” settings, privacy, and join restrictions.",
       parameters: EmptyParamSchema,
       async execute() {
         const data = await xblFetch<unknown>(apiKey, "/session/config");
         return toolResult(JSON.stringify(data, null, 2));
       },
-    },
-    { optional: true }
+    }
   );
 }

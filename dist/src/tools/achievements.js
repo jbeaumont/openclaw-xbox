@@ -5,7 +5,7 @@ import { toolResult } from "../result.js";
 export function registerAchievementTools(api, apiKey) {
     api.registerTool({
         name: "xbox_my_achievements",
-        description: "Get the authenticated user's Xbox Live achievement progress across all titles — gamerscore earned, achievements unlocked, and progress percentage per title.",
+        description: "Get the authenticated user's Xbox Live achievement progress across all titles â€” gamerscore earned, achievements unlocked, and progress percentage per title.",
         parameters: EmptyParamSchema,
         async execute() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +15,7 @@ export function registerAchievementTools(api, apiKey) {
                 return toolResult("No achievement titles found.");
             return toolResult(JSON.stringify(titles, null, 2));
         },
-    }, { optional: true });
+    });
     api.registerTool({
         name: "xbox_player_achievements",
         description: "Get Xbox Live achievement progress for another player by their XUID. Optionally filter by a specific title ID.",
@@ -27,5 +27,5 @@ export function registerAchievementTools(api, apiKey) {
             const data = await xblFetch(apiKey, path);
             return toolResult(JSON.stringify(data, null, 2));
         },
-    }, { optional: true });
+    });
 }

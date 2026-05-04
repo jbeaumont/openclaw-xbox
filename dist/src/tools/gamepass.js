@@ -15,7 +15,7 @@ function makeGamePassTool(api, apiKey, name, description, path) {
                 return toolResult("No titles found.");
             return toolResult(JSON.stringify(titles, null, 2));
         },
-    }, { optional: true });
+    });
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function registerGamePassTools(api, apiKey) {

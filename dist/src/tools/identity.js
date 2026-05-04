@@ -5,7 +5,7 @@ import { toolResult } from "../result.js";
 export function registerIdentityTools(api, apiKey) {
     api.registerTool({
         name: "xbox_my_profile",
-        description: "Get the authenticated Xbox Live user's own profile — gamertag, XUID, gamerscore, account tier, bio, and location.",
+        description: "Get the authenticated Xbox Live user's own profile â€” gamertag, XUID, gamerscore, account tier, bio, and location.",
         parameters: EmptyParamSchema,
         async execute() {
             const data = await xblFetch(apiKey, "/account");
@@ -14,7 +14,7 @@ export function registerIdentityTools(api, apiKey) {
                 return toolResult("No profile data returned.");
             return toolResult(JSON.stringify(profile, null, 2));
         },
-    }, { optional: true });
+    });
     api.registerTool({
         name: "xbox_search_player",
         description: "Look up an Xbox Live player by gamertag. Returns their XUID, gamerscore, and profile details.",
@@ -26,5 +26,5 @@ export function registerIdentityTools(api, apiKey) {
                 return toolResult(`No player found for gamertag: ${gamertag}`);
             return toolResult(JSON.stringify(person, null, 2));
         },
-    }, { optional: true });
+    });
 }

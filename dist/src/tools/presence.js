@@ -5,7 +5,7 @@ import { toolResult } from "../result.js";
 export function registerPresenceTools(api, apiKey) {
     api.registerTool({
         name: "xbox_friends_presence",
-        description: "Get the online presence of all Xbox Live friends — who is online, what they are playing, and on which device.",
+        description: "Get the online presence of all Xbox Live friends â€” who is online, what they are playing, and on which device.",
         parameters: EmptyParamSchema,
         async execute() {
             const data = await xblFetch(apiKey, "/friends");
@@ -14,7 +14,7 @@ export function registerPresenceTools(api, apiKey) {
                 return toolResult("No friends found.");
             return toolResult(JSON.stringify(people, null, 2));
         },
-    }, { optional: true });
+    });
     api.registerTool({
         name: "xbox_player_presence",
         description: "Get the current online presence for a specific Xbox Live player by their XUID.",
@@ -23,5 +23,5 @@ export function registerPresenceTools(api, apiKey) {
             const data = await xblFetch(apiKey, `/${encodeURIComponent(xuid)}/presence`);
             return toolResult(JSON.stringify(data, null, 2));
         },
-    }, { optional: true });
+    });
 }
