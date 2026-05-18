@@ -110,10 +110,10 @@ If you have a `tools.profile` configured, it may not include plugin tools. The c
 
 ```bash
 openclaw config unset tools.profile
-openclaw config set tools.allow '["group:openclaw", "openclaw-xbox"]'
+openclaw config set tools.allow '["group:default", "openclaw-xbox"]'
 ```
 
-`group:openclaw` covers all the same built-in tools as the `coding` profile. Then restart the gateway.
+`group:default` is the full standard toolset (read, write, exec, and more). Then restart the gateway.
 
 ---
 
