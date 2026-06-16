@@ -1,6 +1,15 @@
 import { xblFetch, XblApiError } from "./client.js";
 import type { Profile, Friend, GameTitle, GamePassTitle, Session } from "./types.js";
 import { getSetting } from "./types.js";
+import {
+  normalizeList,
+  formatProfile,
+  formatFriendsList,
+  formatSearchResult,
+  formatAchievements,
+  formatGamePass,
+  formatSessions,
+} from "./format.js";
 
 const HELP_TEXT = `
 **Xbox Live** — available commands:
@@ -15,41 +24,6 @@ const HELP_TEXT = `
   /xbox gamepass ea         EA Play titles
   /xbox sessions            Active sessions and party members
 `.trim();
-
-function formatProfile(p: Profile): string {
-  const gamertag = getSetting(p, "Gamertag") ?? getSetting(p, "ModernGamertag") ?? "Unknown";
-  const gamerscore = getSetting(p, "Gamerscore");
-  const tier = getSetting(p, "AccountTier");
-  const location = getSetting(p, "Location");
-  const bio = getSetting(p, "Bio");
-  const lines = [`**${gamertag}**`];
-  if (gamerscore) lines.push(`Gamerscore: ${parseInt(gamerscore).toLocaleString()}`);
-  if (tier) lines.push(`Tier: ${tier}`);
-  if (location) lines.push(`Location: ${location}`);
-  if (bio) lines.push(`Bio: ${bio}`);
-  lines.push(`XUID: \`${p.id}\``);
-  return lines.join("\n");
-}
-
-function formatFriend(f: Friend): string {
-  const status = f.presenceState === "Online" ? "🟢" : "⚫";
-  let line = `${status} **${f.gamertag}**`;
-  if (f.presenceText) line += ` — ${f.presenceText}`;
-  return line;
-}
-
-
-
-function formatSession(s: Session): string {
-  const lines: string[] = [];
-  if (s.sessionName) lines.push(`**${s.sessionName}**`);
-  if (s.titleId) lines.push(`Title ID: \`${s.titleId}\``);
-  if (s.status) lines.push(`Status: ${s.status}`);
-  if (s.members?.length) {
-    lines.push(`Members: ${s.members.map(m => m.gamertag ?? m.xuid ?? "unknown").join(", ")}`);
-  }
-  return lines.join("\n") || "Session (no details)";
-}
 
 async function handleSetup(apiKey: string | undefined): Promise<string> {
   if (!apiKey) {
@@ -66,12 +40,14 @@ async function handleSetup(apiKey: string | undefined): Promise<string> {
       "   openclaw config set plugins.entries.openclaw-xbox.config.apiKey YOUR_KEY",
       "   ```",
       "",
-      "4. Run `/xbox setup` again to verify the connection.",
+      "   (Or set the `OPENCLAW_XBOX_API_KEY` environment variable.)",
+      "",
+      "4. Restart the gateway, then run `/xbox setup` again to verify.",
     ].join("\n");
   }
 
   try {
-    const data = await xblFetch<{ profileUsers: Profile[] }>(apiKey, "/account");
+    const data = await xblFetch<{ profileUsers: Profile[] }>(apiKey, "/account", { ttlMs: 0 });
     const profile = data.profileUsers?.[0];
     if (!profile) throw new Error("No profile returned");
     const gamertag = getSetting(profile, "Gamertag") ?? getSetting(profile, "ModernGamertag") ?? "Unknown";
@@ -82,19 +58,15 @@ async function handleSetup(apiKey: string | undefined): Promise<string> {
       `✅ API key configured`,
       `✅ Connection verified — signed in as **${gamertag}** (G: ${gamerscore.toLocaleString()})`,
       "",
-      "All 11 tools are active. Type `/xbox help` to see available commands.",
+      "Type `/xbox help` to see available commands.",
     ].join("\n");
   } catch (err) {
-    const detail = err instanceof XblApiError
-      ? `API error ${err.status}: ${err.message}`
-      : String(err);
+    const detail = err instanceof XblApiError ? err.hint : String(err);
     return [
       "**Xbox Live Setup**",
       "",
       `✅ API key configured`,
       `❌ Connection failed — ${detail}`,
-      "",
-      "Check that your API key is correct at **https://xbl.io**.",
     ].join("\n");
   }
 }
@@ -107,69 +79,20 @@ async function handleProfile(apiKey: string): Promise<string> {
 }
 
 async function handleFriends(apiKey: string): Promise<string> {
-  const data = await xblFetch<{ people: Friend[] }>(apiKey, "/friends");
-  const people = data.people ?? [];
-  if (people.length === 0) return "No friends found.";
-
-  const online = people.filter(f => f.presenceState === "Online");
-  const offline = people.filter(f => f.presenceState !== "Online");
-
-  const lines: string[] = [`**Friends** (${online.length} online, ${offline.length} offline)`];
-  if (online.length) lines.push("", ...online.map(formatFriend));
-  if (offline.length) lines.push("", ...offline.map(formatFriend));
-  return lines.join("\n");
+  const raw = await xblFetch<unknown>(apiKey, "/friends");
+  return formatFriendsList(normalizeList<Friend>(raw, "people"));
 }
 
 async function handleSearch(apiKey: string, gamertag: string): Promise<string> {
   if (!gamertag) return "Usage: `/xbox search <gamertag>`";
-  const data = await xblFetch<{ people: Friend[] }>(
-    apiKey,
-    `/search/${encodeURIComponent(gamertag)}`
-  );
-  const person = data.people?.[0];
-  if (!person) return `No player found for gamertag: **${gamertag}**`;
-  const lines = [`**${person.gamertag ?? gamertag}**`];
-  if (person.gamerScore) lines.push(`Gamerscore: ${parseInt(person.gamerScore).toLocaleString()}`);
-  if (person.realName) lines.push(`Name: ${person.realName}`);
-  if (person.presenceState) lines.push(`Status: ${person.presenceState}`);
-  if (person.presenceText) lines.push(person.presenceText);
-  lines.push(`XUID: \`${person.xuid}\``);
-  return lines.join("\n");
+  const raw = await xblFetch<unknown>(apiKey, `/search/${encodeURIComponent(gamertag)}`);
+  const people = normalizeList<Friend>(raw, "people");
+  return formatSearchResult(people[0], gamertag);
 }
 
 async function handleAchievements(apiKey: string): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = await xblFetch<any>(apiKey, "/achievements");
-  let titles: GameTitle[];
-  if (Array.isArray(raw)) {
-    titles = raw;
-  } else if (raw?.titles && Array.isArray(raw.titles)) {
-    titles = raw.titles;
-  } else if (raw && typeof raw === "object") {
-    titles = Object.values(raw) as GameTitle[];
-  } else {
-    titles = [];
-  }
-  if (titles.length === 0) return "No achievement titles found.";
-
-  const totalScore = titles.reduce((sum, t) => sum + (t.achievement?.currentGamerscore ?? 0), 0);
-  const lines = [
-    `**Achievements** — ${titles.length} titles, ${totalScore.toLocaleString()}G`,
-    "",
-    ...titles.filter(t => (t.achievement?.currentGamerscore ?? 0) > 0).slice(0, 25).map(t => {
-      const a = t.achievement;
-      let line = `• **${t.name}**`;
-      if (a) {
-        const total = a.totalAchievements ? `/${a.totalAchievements}` : "";
-        line += ` — ${a.currentAchievements ?? 0}${total} achievements, ${(a.currentGamerscore ?? 0).toLocaleString()}/${(a.totalGamerscore ?? 0).toLocaleString()}G`;
-      }
-      if (a?.progressPercentage != null) line += ` (${a.progressPercentage}%)`;
-      return line;
-    }),
-  ];
-  const withProgress = titles.filter(t => (t.achievement?.currentGamerscore ?? 0) > 0);
-  if (withProgress.length > 25) lines.push(`…and ${withProgress.length - 25} more with progress.`);
-  return lines.join("\n");
+  const raw = await xblFetch<unknown>(apiKey, "/achievements");
+  return formatAchievements(normalizeList<GameTitle>(raw, "titles"));
 }
 
 async function handleGamePass(apiKey: string, sub: string): Promise<string> {
@@ -181,28 +104,13 @@ async function handleGamePass(apiKey: string, sub: string): Promise<string> {
   const target = pathMap[sub];
   if (!target) return `Unknown option \`${sub}\`. Try: /xbox gamepass, /xbox gamepass pc, /xbox gamepass ea`;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = await xblFetch<any>(apiKey, target.path);
-  const all: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
-  if (all.length === 0) return `No titles found in ${target.label}.`;
-
-  return [
-    `**${target.label}** — ${all.length} titles available`,
-    "",
-    "_The catalog API returns product IDs only. Ask the agent to look up a specific game by name or ID._",
-  ].join("\n");
+  const raw = await xblFetch<unknown>(apiKey, target.path);
+  return formatGamePass(normalizeList<GamePassTitle>(raw), target.label);
 }
 
 async function handleSessions(apiKey: string): Promise<string> {
-  const data = await xblFetch<{ results: Session[] }>(apiKey, "/session");
-  const sessions = data.results ?? [];
-  if (sessions.length === 0) return "No active sessions found.";
-
-  return [
-    `**Sessions** — ${sessions.length} active`,
-    "",
-    ...sessions.map(formatSession),
-  ].join("\n");
+  const raw = await xblFetch<unknown>(apiKey, "/session");
+  return formatSessions(normalizeList<Session>(raw, "results"));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -267,9 +175,7 @@ export function registerCommands(api: any, apiKey: string | undefined) {
 
         return { text };
       } catch (err) {
-        const detail = err instanceof XblApiError
-          ? `${err.status}: ${err.message}`
-          : String(err);
+        const detail = err instanceof XblApiError ? err.hint : String(err);
         return { text: `❌ Xbox Live error — ${detail}` };
       }
     },

@@ -52,6 +52,19 @@ export const SessionSchema = Type.Object({
     }))),
     status: Type.Optional(Type.String()),
 });
+export const MediaItemSchema = Type.Object({
+    titleId: Type.Optional(Type.String()),
+    titleName: Type.Optional(Type.String()),
+    uri: Type.Optional(Type.String()),
+    dateTaken: Type.Optional(Type.String()),
+    datePublished: Type.Optional(Type.String()),
+});
+export const ClubSchema = Type.Object({
+    id: Type.Optional(Type.String()),
+    name: Type.Optional(Type.String()),
+    description: Type.Optional(Type.String()),
+    membersCount: Type.Optional(Type.Number()),
+});
 // --- Tool parameter schemas ---
 export const XuidParamSchema = Type.Object({
     xuid: Type.String({ description: "Xbox User ID (XUID) of the player" }),
@@ -62,5 +75,28 @@ export const GamertagParamSchema = Type.Object({
 export const PlayerAchievementsParamSchema = Type.Object({
     xuid: Type.String({ description: "Xbox User ID (XUID) of the player" }),
     titleId: Type.Optional(Type.String({ description: "Limit results to a specific title ID" })),
+});
+export const ProductIdParamSchema = Type.Object({
+    productId: Type.String({ description: "Marketplace product ID (Store ID) of the game" }),
+});
+export const ClubSearchParamSchema = Type.Object({
+    query: Type.String({ description: "Club name or keyword to search for" }),
+});
+export const ClubIdParamSchema = Type.Object({
+    clubId: Type.String({ description: "Club ID" }),
+});
+// --- Write-tool parameter schemas (require explicit confirmation) ---
+export const FriendWriteParamSchema = Type.Object({
+    xuid: Type.String({ description: "XUID of the player to add or remove as a friend" }),
+    confirm: Type.Boolean({
+        description: "Must be true to actually perform this state-changing action. Confirm with the user first.",
+    }),
+});
+export const SendMessageParamSchema = Type.Object({
+    xuid: Type.String({ description: "XUID of the recipient" }),
+    message: Type.String({ description: "Message text to send" }),
+    confirm: Type.Boolean({
+        description: "Must be true to actually send the message. Confirm with the user first.",
+    }),
 });
 export const EmptyParamSchema = Type.Object({});

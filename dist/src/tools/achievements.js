@@ -1,19 +1,16 @@
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, PlayerAchievementsParamSchema } from "../types.js";
+import { normalizeList, formatAchievements } from "../format.js";
 import { toolResult } from "../result.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function registerAchievementTools(api, apiKey) {
     api.registerTool({
         name: "xbox_my_achievements",
-        description: "Get the authenticated user's Xbox Live achievement progress across all titles â€” gamerscore earned, achievements unlocked, and progress percentage per title.",
+        description: "Get the authenticated user's Xbox Live achievement progress across all titles — gamerscore earned, achievements unlocked, and progress percentage per title.",
         parameters: EmptyParamSchema,
         async execute() {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const raw = await xblFetch(apiKey, "/achievements");
-            const titles = Array.isArray(raw) ? raw : (raw?.titles && Array.isArray(raw.titles)) ? raw.titles : (raw && typeof raw === "object" ? Object.values(raw) : []);
-            if (titles.length === 0)
-                return toolResult("No achievement titles found.");
-            return toolResult(JSON.stringify(titles, null, 2));
+            return toolResult(formatAchievements(normalizeList(raw, "titles")));
         },
     });
     api.registerTool({
@@ -24,8 +21,12 @@ export function registerAchievementTools(api, apiKey) {
             const path = titleId
                 ? `/achievements/player/${encodeURIComponent(xuid)}/${encodeURIComponent(titleId)}`
                 : `/achievements/player/${encodeURIComponent(xuid)}`;
-            const data = await xblFetch(apiKey, path);
-            return toolResult(JSON.stringify(data, null, 2));
+            const raw = await xblFetch(apiKey, path);
+            // Title-filtered queries return raw achievement detail; the all-titles
+            // query returns per-title summaries we can format compactly.
+            if (titleId)
+                return toolResult(JSON.stringify(raw, null, 2));
+            return toolResult(formatAchievements(normalizeList(raw, "titles")));
         },
     });
 }

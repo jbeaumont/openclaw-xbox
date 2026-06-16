@@ -1,5 +1,6 @@
-﻿import { xblFetch } from "../client.js";
+import { xblFetch } from "../client.js";
 import { EmptyParamSchema, GamePassTitle } from "../types.js";
+import { normalizeList, formatGamePass } from "../format.js";
 import { toolResult } from "../result.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,7 +9,8 @@ function makeGamePassTool(
   apiKey: string,
   name: string,
   description: string,
-  path: string
+  path: string,
+  label: string
 ) {
   api.registerTool(
     {
@@ -16,11 +18,8 @@ function makeGamePassTool(
       description,
       parameters: EmptyParamSchema,
       async execute() {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const raw = await xblFetch<any>(apiKey, path);
-        const titles: GamePassTitle[] = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
-        if (titles.length === 0) return toolResult("No titles found.");
-        return toolResult(JSON.stringify(titles, null, 2));
+        const raw = await xblFetch<unknown>(apiKey, path);
+        return toolResult(formatGamePass(normalizeList<GamePassTitle>(raw), label));
       },
     }
   );
@@ -32,20 +31,23 @@ export function registerGamePassTools(api: any, apiKey: string) {
     api, apiKey,
     "xbox_gamepass_all",
     "List all titles currently available in Xbox Game Pass.",
-    "/gamepass/all"
+    "/gamepass/all",
+    "Game Pass"
   );
 
   makeGamePassTool(
     api, apiKey,
     "xbox_gamepass_pc",
     "List titles available in PC Game Pass.",
-    "/gamepass/pc"
+    "/gamepass/pc",
+    "PC Game Pass"
   );
 
   makeGamePassTool(
     api, apiKey,
     "xbox_gamepass_ea_play",
     "List titles available through EA Play (included with Game Pass Ultimate).",
-    "/gamepass/ea-play"
+    "/gamepass/ea-play",
+    "EA Play"
   );
 }

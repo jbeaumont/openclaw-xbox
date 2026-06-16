@@ -1,7 +1,7 @@
 {
   "name": "@jbeaumont/openclaw-xbox",
-  "version": "0.1.0",
-  "description": "OpenClaw plugin for Xbox Live via xbl.io — profiles, presence, achievements, Game Pass, and sessions",
+  "version": "0.2.0",
+  "description": "OpenClaw plugin for Xbox Live via xbl.io — profiles, presence, achievements, Game Pass, title history, DVR media, clubs, and sessions",
   "type": "module",
   "license": "MIT",
   "author": "jbeaumont",
@@ -9,12 +9,34 @@
     "type": "git",
     "url": "https://github.com/jbeaumont/openclaw-xbox.git"
   },
+  "files": [
+    "index.ts",
+    "src",
+    "dist",
+    "skills",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.19"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "prepublishOnly": "npm run rebuild"
+  },
   "openclaw": {
     "extensions": ["./index.ts"],
     "runtimeExtensions": ["./dist/index.js"],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.5.2"
     }
   },
   "dependencies": {
