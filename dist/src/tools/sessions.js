@@ -1,6 +1,6 @@
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema } from "../types.js";
-import { normalizeList, formatSessions } from "../format.js";
+import { normalizeList, formatSessions, formatSessionConfig } from "../format.js";
 import { toolResult } from "../result.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function registerSessionTools(api, apiKey) {
@@ -19,7 +19,7 @@ export function registerSessionTools(api, apiKey) {
         parameters: EmptyParamSchema,
         async execute() {
             const data = await xblFetch(apiKey, "/session/config");
-            return toolResult(JSON.stringify(data, null, 2));
+            return toolResult(formatSessionConfig(data));
         },
     });
 }

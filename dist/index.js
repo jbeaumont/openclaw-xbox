@@ -10,6 +10,7 @@ import { registerClubTools, registerCatalogTools } from "./src/tools/clubs.js";
 import { registerWriteTools } from "./src/tools/write.js";
 import { registerCommands } from "./src/commands.js";
 import { resolveConfig } from "./src/config.js";
+import { collectXboxSecurityFindings } from "./src/security.js";
 import { READ_TOOLS, WRITE_TOOLS } from "./src/tool-names.js";
 const AUTO_ENABLE_PATH = "plugins.entries.openclaw-xbox.config.apiKey";
 export default definePluginEntry({
@@ -26,6 +27,8 @@ export default definePluginEntry({
                 return AUTO_ENABLE_PATH;
             return null;
         });
+        // Contribute security findings to `openclaw` audits / ClawHub trust scans.
+        api.registerSecurityAuditCollector?.(collectXboxSecurityFindings);
         const { apiKey, enableWriteTools } = resolveConfig(api);
         // Commands are always registered — /xbox setup works even without a key
         registerCommands(api, apiKey);

@@ -3,6 +3,22 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-06-16
+
+### Added
+- Setup/onboarding integration: declares the `xbl-io` provider (with the
+  `OPENCLAW_XBOX_API_KEY` env var) in the manifest `setup` block, so the key
+  surfaces in `openclaw onboard` and setup/status flows.
+- Security audit collector: contributes findings to `openclaw` audits and the
+  ClawHub trust scan (warns when write tools are enabled; notes a plaintext
+  API key and recommends env/secret refs).
+
+### Changed
+- Consistent, delightful output: every tool now returns formatted Markdown with
+  tasteful emojis instead of raw JSON. `xbox_player_presence`,
+  `xbox_session_config`, `xbox_club_details`, `xbox_game_details`, and
+  title-filtered `xbox_player_achievements` are now formatted.
+
 ## [0.3.0] - 2026-06-16
 
 ### Changed

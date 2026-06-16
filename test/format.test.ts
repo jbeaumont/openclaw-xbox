@@ -11,6 +11,11 @@ import {
   formatTitleHistory,
   formatMedia,
   formatClubs,
+  formatPresence,
+  formatSessionConfig,
+  formatClubDetails,
+  formatGameDetails,
+  formatAchievementList,
 } from "../src/format.js";
 import type { Profile, Friend, GameTitle } from "../src/types.js";
 
@@ -124,5 +129,46 @@ describe("formatSessions / formatTitleHistory / formatMedia / formatClubs", () =
     const out = formatClubs([{ id: "c1", name: "ClawClub", membersCount: 42 }]);
     assert.match(out, /ClawClub/);
     assert.match(out, /42 members/);
+  });
+});
+
+describe("detail formatters (previously raw JSON)", () => {
+  test("presence: online shows what they're playing", () => {
+    const out = formatPresence({ state: "Online", devices: [{ type: "XboxSeriesX", titles: [{ name: "Halo Infinite" }] }] });
+    assert.match(out, /🟢 \*\*Online\*\*/);
+    assert.match(out, /Halo Infinite/);
+    assert.match(out, /XboxSeriesX/);
+  });
+  test("presence: offline shows last seen", () => {
+    const out = formatPresence({ state: "Offline", lastSeen: { titleName: "Forza", timestamp: "2026-06-01T12:00:00Z" } });
+    assert.match(out, /⚫ \*\*Offline\*\*/);
+    assert.match(out, /Forza/);
+    assert.match(out, /2026-06-01/);
+  });
+  test("presence: unrecognized payload degrades gracefully", () => {
+    assert.match(formatPresence({}), /Offline/);
+  });
+  test("session config extracts visibility/join restriction", () => {
+    const out = formatSessionConfig({ constants: { system: { visibility: "open", joinRestriction: "followed", maxMembersCount: 16 } } });
+    assert.match(out, /Visibility: open/);
+    assert.match(out, /Join restriction: followed/);
+    assert.match(out, /Max members: 16/);
+  });
+  test("club details renders name and members", () => {
+    const out = formatClubDetails({ id: "c9", name: "Speedrunners", description: "Fast", membersCount: 100 });
+    assert.match(out, /Speedrunners/);
+    assert.match(out, /Members: 100/);
+  });
+  test("game details renders title; missing title notes the id", () => {
+    assert.match(formatGameDetails({ products: [{ title: "Doom Eternal" }] }, "ABC"), /Doom Eternal/);
+    assert.match(formatGameDetails({}, "XYZ"), /XYZ/);
+  });
+  test("achievement list marks unlocked vs locked", () => {
+    const out = formatAchievementList({ achievements: [
+      { name: "First Blood", progressState: "Achieved", rewards: [{ type: "Gamerscore", value: 20 }] },
+      { name: "Hidden", progressState: "NotStarted" },
+    ] });
+    assert.match(out, /✅ First Blood — 20G/);
+    assert.match(out, /⬜ Hidden/);
   });
 });
