@@ -10,11 +10,22 @@ import { registerClubTools, registerCatalogTools } from "./src/tools/clubs.js";
 import { registerWriteTools } from "./src/tools/write.js";
 import { registerCommands } from "./src/commands.js";
 import { resolveConfig } from "./src/config.js";
+import { READ_TOOLS, WRITE_TOOLS } from "./src/tool-names.js";
+const AUTO_ENABLE_PATH = "plugins.entries.openclaw-xbox.config.apiKey";
 export default definePluginEntry({
     id: "openclaw-xbox",
     name: "Xbox Live",
     description: "Xbox Live tools via xbl.io — profiles, presence, achievements, Game Pass catalog, and sessions",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     register(api) {
+        // Auto-enable the plugin once a key is present, so users don't need a
+        // separate `openclaw plugins enable` step. (No-op on runtimes without it.)
+        api.registerAutoEnableProbe?.((ctx) => {
+            const cfg = ctx?.config?.plugins?.entries?.["openclaw-xbox"]?.config;
+            if (cfg?.apiKey || ctx?.env?.OPENCLAW_XBOX_API_KEY)
+                return AUTO_ENABLE_PATH;
+            return null;
+        });
         const { apiKey, enableWriteTools } = resolveConfig(api);
         // Commands are always registered — /xbox setup works even without a key
         registerCommands(api, apiKey);
@@ -36,6 +47,15 @@ export default definePluginEntry({
         if (enableWriteTools) {
             registerWriteTools(api, apiKey);
             api.logger?.info("openclaw-xbox: write tools enabled (add/remove friend, send message)");
+        }
+        // Display/policy metadata so surfaces can show risk levels. (No-op if unsupported.)
+        for (const toolName of READ_TOOLS) {
+            api.registerToolMetadata?.({ toolName, risk: "low", tags: ["xbox", "read"] });
+        }
+        if (enableWriteTools) {
+            for (const toolName of WRITE_TOOLS) {
+                api.registerToolMetadata?.({ toolName, risk: "high", tags: ["xbox", "write"] });
+            }
         }
     },
 });

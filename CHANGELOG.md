@@ -3,6 +3,25 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-06-16
+
+### Changed
+- **Startup-lazy activation.** `activation.onStartup` is now `false`; the plugin
+  loads on demand via `activation.onCommands` (`/xbox`) and `onConfigPaths`,
+  instead of loading on every gateway startup.
+- Moved `typescript` to `devDependencies` — the published plugin now has a single
+  runtime dependency (`@sinclair/typebox`).
+- Ship `tsconfig.json` and `CHANGELOG.md` so consumers can rebuild from source.
+
+### Added
+- `toolMetadata` config signals in the manifest so the gateway knows each tool's
+  availability (requires `apiKey`; write tools also require `enableWriteTools`)
+  without importing the plugin runtime.
+- Auto-enable probe: setting the API key enables the plugin without a separate
+  `openclaw plugins enable` step.
+- Runtime tool risk metadata (read tools `low`, write tools `high`).
+- Extended the contract test to validate manifest `toolMetadata` and activation.
+
 ## [0.2.0] - 2026-06-16
 
 ### Added

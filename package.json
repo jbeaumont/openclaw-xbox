@@ -1,6 +1,6 @@
 {
   "name": "@jbeaumont/openclaw-xbox",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "OpenClaw plugin for Xbox Live via xbl.io — profiles, presence, achievements, Game Pass, title history, DVR media, clubs, and sessions",
   "type": "module",
   "license": "MIT",
@@ -15,7 +15,9 @@
     "dist",
     "skills",
     "openclaw.plugin.json",
+    "tsconfig.json",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "engines": {
@@ -42,11 +44,11 @@
     }
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.0",
-    "typescript": "^5.4.0"
+    "@sinclair/typebox": "^0.34.0"
   },
   "devDependencies": {
     "openclaw": "latest",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
   }
 }

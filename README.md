@@ -38,15 +38,18 @@ openclaw plugins install git:github.com/jbeaumont/openclaw-xbox
 1. Go to [xbl.io](https://xbl.io) and sign in with your Microsoft account — this links your Xbox Live account.
 2. Open **API Keys** in the dashboard and copy your key.
 
-### 2. Enable the plugin and set the key
+### 2. Set the key
 
 ```bash
-openclaw config set plugins.entries.openclaw-xbox.enabled true
 openclaw config set plugins.entries.openclaw-xbox.config.apiKey YOUR_KEY_HERE
 ```
 
-Prefer not to store the key in config? Set the `OPENCLAW_XBOX_API_KEY` environment
-variable instead. Then restart the gateway so it picks up the plugin.
+That's it — setting the key **auto-enables** the plugin (no separate
+`plugins enable` step). Prefer not to store the key in config? Set the
+`OPENCLAW_XBOX_API_KEY` environment variable instead. Then restart the gateway.
+
+The plugin is startup-lazy: it loads on demand when you use `/xbox` or when its
+config is present, so it adds no cost to gateway startup until you actually use it.
 
 ### 3. Verify
 
