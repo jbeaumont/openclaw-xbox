@@ -3,6 +3,13 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-06-16
+
+### Changed
+- README is now consumer-focused: documents the `openclaw onboard` setup path,
+  and moves development/release/publishing instructions to `CONTRIBUTING.md`
+  (they don't belong on the public ClawHub listing).
+
 ## [0.4.0] - 2026-06-16
 
 ### Added
@@ -14,9 +21,6 @@ All notable changes to this project are documented here. This project adheres to
   API key and recommends env/secret refs).
 
 ### Changed
-- README is now consumer-focused: documents the `openclaw onboard` setup path,
-  and moves development/release/publishing instructions to `CONTRIBUTING.md`
-  (they don't belong on the public ClawHub listing).
 - Consistent, delightful output: every tool now returns formatted Markdown with
   tasteful emojis instead of raw JSON. `xbox_player_presence`,
   `xbox_session_config`, `xbox_club_details`, `xbox_game_details`, and
