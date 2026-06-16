@@ -3,6 +3,13 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-06-16
+
+### Fixed
+- Corrected the ClawHub install command in the README: use the scoped package
+  name `clawhub:@jbeaumont/openclaw-xbox` (the registry resolves plugins by
+  `@owner/name`, not the bare plugin id).
+
 ## [0.4.1] - 2026-06-16
 
 ### Changed
