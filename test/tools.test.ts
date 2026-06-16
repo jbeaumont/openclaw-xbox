@@ -1,12 +1,27 @@
-import { test, describe, afterEach } from "node:test";
+import { test, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import entry from "../index.js";
 import { makeApi, installFetch, findTool, textOf } from "./helpers.js";
 
 let active: { restore: () => void } | undefined;
+
+// These tests assert config-driven registration, so they must be independent of
+// ambient env (e.g. a real OPENCLAW_XBOX_API_KEY set for `npm run test:live`).
+const ENV_KEYS = ["OPENCLAW_XBOX_API_KEY", "OPENCLAW_XBOX_ENABLE_WRITE_TOOLS"];
+const savedEnv: Record<string, string | undefined> = {};
+beforeEach(() => {
+  for (const k of ENV_KEYS) {
+    savedEnv[k] = process.env[k];
+    delete process.env[k];
+  }
+});
 afterEach(() => {
   active?.restore();
   active = undefined;
+  for (const k of ENV_KEYS) {
+    if (savedEnv[k] === undefined) delete process.env[k];
+    else process.env[k] = savedEnv[k];
+  }
 });
 
 const READ_TOOLS = [

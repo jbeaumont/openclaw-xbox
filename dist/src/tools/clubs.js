@@ -35,8 +35,11 @@ export function registerCatalogTools(api, apiKey) {
                 return toolResult(JSON.stringify(data, null, 2));
             }
             catch (err) {
-                if (err instanceof XblApiError && err.status === 404) {
-                    return toolResult(`No marketplace details found for product ID ${productId}. The xbl.io marketplace endpoint may not be available on your plan.`);
+                // xbl.io returns 404, or a 500 with a NOT_FOUND body, when a product ID
+                // does not resolve. Game Pass catalog IDs are not always Store product
+                // IDs, so this is an expected, non-fatal outcome.
+                if (err instanceof XblApiError && (err.status === 404 || /not_?found/i.test(err.message))) {
+                    return toolResult(`No marketplace details found for product ID ${productId}. Note: Game Pass catalog IDs are not always Store product IDs — this lookup needs a marketplace/Store product ID.`);
                 }
                 throw err;
             }
