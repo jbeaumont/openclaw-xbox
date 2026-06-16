@@ -26,6 +26,8 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "rebuild": "npm run clean && npm run build",
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "test:live": "OPENCLAW_XBOX_LIVE=1 node --import tsx --test \"test/**/*.test.ts\"",
     "prepublishOnly": "npm run rebuild"
   },
   "openclaw": {
@@ -44,6 +46,7 @@
     "typescript": "^5.4.0"
   },
   "devDependencies": {
-    "openclaw": "latest"
+    "openclaw": "latest",
+    "tsx": "^4.19.0"
   }
 }
