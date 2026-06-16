@@ -1,6 +1,7 @@
 import { test, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import entry from "../index.js";
+import { READ_TOOLS, WRITE_TOOLS } from "../src/tool-names.js";
 import { makeApi, installFetch, findTool, textOf } from "./helpers.js";
 
 let active: { restore: () => void } | undefined;
@@ -23,29 +24,6 @@ afterEach(() => {
     else process.env[k] = savedEnv[k];
   }
 });
-
-const READ_TOOLS = [
-  "xbox_my_profile",
-  "xbox_search_player",
-  "xbox_friends_presence",
-  "xbox_player_presence",
-  "xbox_player_presence_by_gamertag",
-  "xbox_my_achievements",
-  "xbox_player_achievements",
-  "xbox_gamepass_all",
-  "xbox_gamepass_pc",
-  "xbox_gamepass_ea_play",
-  "xbox_sessions",
-  "xbox_session_config",
-  "xbox_my_title_history",
-  "xbox_player_title_history",
-  "xbox_screenshots",
-  "xbox_game_clips",
-  "xbox_search_clubs",
-  "xbox_club_details",
-  "xbox_game_details",
-];
-const WRITE_TOOLS = ["xbox_add_friend", "xbox_remove_friend", "xbox_send_message"];
 
 describe("plugin registration", () => {
   test("registers the command but no tools when no key is configured", () => {

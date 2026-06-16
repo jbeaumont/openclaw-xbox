@@ -28,9 +28,35 @@
       "xbox_send_message"
     ]
   },
+  "toolMetadata": {
+    "xbox_my_profile": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_search_player": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_friends_presence": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_player_presence": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_player_presence_by_gamertag": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_my_achievements": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_player_achievements": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_gamepass_all": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_gamepass_pc": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_gamepass_ea_play": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_sessions": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_session_config": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_my_title_history": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_player_title_history": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_screenshots": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_game_clips": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_search_clubs": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_club_details": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_game_details": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_add_friend": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] },
+    "xbox_remove_friend": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] },
+    "xbox_send_message": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] }
+  },
   "skills": ["./skills"],
   "activation": {
-    "onStartup": true
+    "onStartup": false,
+    "onCommands": ["xbox"],
+    "onConfigPaths": ["plugins.entries.openclaw-xbox.config"]
   },
   "configSchema": {
     "type": "object",
