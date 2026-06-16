@@ -1,20 +1,31 @@
 {
   "id": "openclaw-xbox",
   "name": "Xbox Live",
-  "description": "Xbox Live tools via xbl.io — look up profiles, presence, achievements, Game Pass catalog, and active sessions",
+  "description": "Xbox Live tools via xbl.io — look up profiles, presence, achievements, Game Pass catalog, title history, DVR media, clubs, and active sessions",
   "contracts": {
     "tools": [
       "xbox_my_profile",
       "xbox_search_player",
       "xbox_friends_presence",
       "xbox_player_presence",
+      "xbox_player_presence_by_gamertag",
       "xbox_my_achievements",
       "xbox_player_achievements",
       "xbox_gamepass_all",
       "xbox_gamepass_pc",
       "xbox_gamepass_ea_play",
       "xbox_sessions",
-      "xbox_session_config"
+      "xbox_session_config",
+      "xbox_my_title_history",
+      "xbox_player_title_history",
+      "xbox_screenshots",
+      "xbox_game_clips",
+      "xbox_search_clubs",
+      "xbox_club_details",
+      "xbox_game_details",
+      "xbox_add_friend",
+      "xbox_remove_friend",
+      "xbox_send_message"
     ]
   },
   "skills": ["./skills"],
@@ -28,6 +39,11 @@
       "apiKey": {
         "type": "string",
         "description": "Your xbl.io API key (X-Authorization header)"
+      },
+      "enableWriteTools": {
+        "type": "boolean",
+        "default": false,
+        "description": "Opt in to state-changing tools (add/remove friend, send message). These are owner-only and require explicit confirmation."
       }
     }
   }

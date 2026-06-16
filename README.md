@@ -1,8 +1,8 @@
 # openclaw-xbox
 
-An [OpenClaw](https://github.com/openclaw/openclaw) plugin that brings Xbox Live data into your AI assistant via the [xbl.io](https://xbl.io) API.
+An [OpenClaw](https://github.com/openclaw/openclaw) plugin that brings Xbox Live data into your AI assistant via the [xbl.io](https://xbl.io) API — profiles, presence, achievements, Game Pass, title history, DVR media, clubs, and sessions.
 
-**v1 tools:** profiles, presence, achievements, Game Pass catalog, and sessions.
+Read-only by default. State-changing actions (add/remove friend, send message) are strictly opt-in.
 
 ---
 
@@ -13,42 +13,54 @@ An [OpenClaw](https://github.com/openclaw/openclaw) plugin that brings Xbox Live
 
 ---
 
-## Setup
+## Install
 
-### 1. Install the plugin
+### From ClawHub (recommended)
+
+[ClawHub](https://docs.openclaw.ai/clawhub) is OpenClaw's plugin registry:
+
+```bash
+openclaw plugins install clawhub:openclaw-xbox
+```
+
+### From git
 
 ```bash
 openclaw plugins install git:github.com/jbeaumont/openclaw-xbox
 ```
 
-### 2. Get an xbl.io API key
+---
 
-1. Go to [xbl.io](https://xbl.io) and sign in with your Microsoft account — this links your Xbox Live account
-2. Navigate to **API Keys** in the dashboard
-3. Copy your key
+## Configure
 
-### 3. Enable the plugin and configure the API key
+### 1. Get an xbl.io API key
+
+1. Go to [xbl.io](https://xbl.io) and sign in with your Microsoft account — this links your Xbox Live account.
+2. Open **API Keys** in the dashboard and copy your key.
+
+### 2. Enable the plugin and set the key
 
 ```bash
 openclaw config set plugins.entries.openclaw-xbox.enabled true
 openclaw config set plugins.entries.openclaw-xbox.config.apiKey YOUR_KEY_HERE
 ```
 
-Then restart the gateway so it picks up the new plugin entry.
+Prefer not to store the key in config? Set the `OPENCLAW_XBOX_API_KEY` environment
+variable instead. Then restart the gateway so it picks up the plugin.
 
-### 4. Verify the connection
+### 3. Verify
 
 ```
 /xbox setup
 ```
 
-This will confirm your key is valid and show your gamertag and gamerscore. If anything is wrong it will tell you what to check.
+This confirms your key is valid and shows your gamertag and gamerscore.
 
 ---
 
 ## Commands
 
-Once configured, use `/xbox` directly in your OpenClaw chat:
+Use `/xbox` directly in your OpenClaw chat:
 
 | Command | Description |
 |---|---|
@@ -58,47 +70,53 @@ Once configured, use `/xbox` directly in your OpenClaw chat:
 | `/xbox friends` | Friends list with online status |
 | `/xbox search <gamertag>` | Look up any player by gamertag |
 | `/xbox achievements` | Your achievement progress across all titles |
-| `/xbox gamepass` | Full Game Pass catalog |
-| `/xbox gamepass pc` | PC Game Pass titles |
-| `/xbox gamepass ea` | EA Play titles |
+| `/xbox gamepass [pc\|ea]` | Game Pass catalog (optionally PC or EA Play) |
 | `/xbox sessions` | Active sessions and party members |
 
 ---
 
-## Agent Tools
+## Agent tools
 
-The plugin also registers tools that the AI agent can use automatically once the plugin is enabled (step 3 above). No `tools.allow` changes needed — the tools are available to the agent by default.
+Once the plugin is enabled with a valid key, these tools are available to the agent
+automatically. They are **additive** — you do not need to swap your `tools.profile`
+or grant a broad toolset (see Troubleshooting).
 
-### Identity
+### Read-only
+
 | Tool | Description |
 |---|---|
-| `xbox_my_profile` | Your own profile — gamertag, XUID, gamerscore, account tier |
+| `xbox_my_profile` | Your own profile — gamertag, XUID, gamerscore, tier |
 | `xbox_search_player` | Look up any player by gamertag |
-
-### Presence
-| Tool | Description |
-|---|---|
 | `xbox_friends_presence` | All friends' online status and what they're playing |
 | `xbox_player_presence` | Presence for a specific player by XUID |
-
-### Achievements
-| Tool | Description |
-|---|---|
+| `xbox_player_presence_by_gamertag` | Search + presence in one call |
 | `xbox_my_achievements` | Your achievements across all titles |
-| `xbox_player_achievements` | Another player's achievements (optionally filtered by title ID) |
+| `xbox_player_achievements` | Another player's achievements (optional title filter) |
+| `xbox_my_title_history` | Your recently played titles |
+| `xbox_player_title_history` | Another player's recently played titles |
+| `xbox_screenshots` | Your recent DVR screenshots |
+| `xbox_game_clips` | Your recent DVR game clips |
+| `xbox_gamepass_all` / `xbox_gamepass_pc` / `xbox_gamepass_ea_play` | Game Pass catalog |
+| `xbox_game_details` | Resolve a marketplace product ID to a title |
+| `xbox_search_clubs` / `xbox_club_details` | Xbox Clubs search and details |
+| `xbox_sessions` / `xbox_session_config` | Active sessions and configuration |
 
-### Game Pass Catalog
+### Write tools (opt-in)
+
+Disabled by default. To enable:
+
+```bash
+openclaw config set plugins.entries.openclaw-xbox.config.enableWriteTools true
+```
+
 | Tool | Description |
 |---|---|
-| `xbox_gamepass_all` | Full Game Pass catalog |
-| `xbox_gamepass_pc` | PC Game Pass titles |
-| `xbox_gamepass_ea_play` | EA Play titles (included with Game Pass Ultimate) |
+| `xbox_add_friend` | Add a player to your friends list |
+| `xbox_remove_friend` | Remove a player from your friends list |
+| `xbox_send_message` | Send a message to a player |
 
-### Sessions & Party
-| Tool | Description |
-|---|---|
-| `xbox_sessions` | Active sessions and party members |
-| `xbox_session_config` | Current session configuration and join settings |
+These tools are **owner-only** and each requires an explicit `confirm` flag, so the
+agent cannot change state without a deliberate, confirmed step.
 
 ---
 
@@ -106,28 +124,46 @@ The plugin also registers tools that the AI agent can use automatically once the
 
 **Agent says a tool isn't available**
 
-If you have a `tools.profile` configured, it may not include plugin tools. The cleanest fix is to replace the profile with an explicit allow list that covers both your existing tools and this plugin:
+If you run a restrictive `tools.profile` (an exclusive allowlist), the plugin's tools
+may not be included. Add this plugin's tools **alongside** your existing setup rather
+than replacing it — do not swap to `group:default` just for this plugin:
 
 ```bash
-openclaw config unset tools.profile
-openclaw config set tools.allow '["group:default", "openclaw-xbox"]'
+# keep whatever you already allow, and add the plugin's tools:
+openclaw config set tools.allow '["...your existing tools...", "openclaw-xbox"]'
 ```
 
-`group:default` is the full standard toolset (read, write, exec, and more). Then restart the gateway.
+Then restart the gateway.
+
+**Rate limited**
+
+The free xbl.io tier allows 150 requests/hour. Responses are cached for 60s to reduce
+calls; if you hit the limit the plugin reports how long to wait.
 
 ---
 
-## Roadmap (v2)
+## Development
 
-- Party invites (`xbox_invite_to_party`)
-- Friends management (`xbox_add_friend`, `xbox_remove_friend`)
-- DVR — game clips and screenshots
-- Marketplace browsing and deals
-- Title history
-- npm / ClawHub publishing
+```bash
+npm install
+npm run typecheck
+npm run rebuild   # cleans and rebuilds dist/
+```
+
+The compiled `dist/` is committed so git installs work without a build step. CI fails
+if `dist/` drifts from `src/` — run `npm run rebuild` and commit before pushing.
+
+### Publishing to ClawHub
+
+```bash
+npm i -g clawhub
+clawhub login
+clawhub package publish . --family code-plugin --dry-run   # preview
+clawhub package publish . --family code-plugin
+```
 
 ---
 
 ## License
 
-MIT
+MIT — see [LICENSE](./LICENSE).
