@@ -1,6 +1,6 @@
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, PlayerAchievementsParamSchema } from "../types.js";
-import { normalizeList, formatAchievements } from "../format.js";
+import { normalizeList, formatAchievements, formatAchievementList } from "../format.js";
 import { toolResult } from "../result.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function registerAchievementTools(api, apiKey) {
@@ -22,10 +22,10 @@ export function registerAchievementTools(api, apiKey) {
                 ? `/achievements/player/${encodeURIComponent(xuid)}/${encodeURIComponent(titleId)}`
                 : `/achievements/player/${encodeURIComponent(xuid)}`;
             const raw = await xblFetch(apiKey, path);
-            // Title-filtered queries return raw achievement detail; the all-titles
-            // query returns per-title summaries we can format compactly.
+            // Title-filtered queries return per-achievement detail; the all-titles
+            // query returns per-title summaries.
             if (titleId)
-                return toolResult(JSON.stringify(raw, null, 2));
+                return toolResult(formatAchievementList(raw));
             return toolResult(formatAchievements(normalizeList(raw, "titles")));
         },
     });

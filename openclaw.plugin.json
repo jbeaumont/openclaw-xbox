@@ -53,6 +53,16 @@
     "xbox_send_message": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] }
   },
   "skills": ["./skills"],
+  "setup": {
+    "providers": [
+      {
+        "id": "xbl-io",
+        "authMethods": ["api-key"],
+        "envVars": ["OPENCLAW_XBOX_API_KEY"]
+      }
+    ],
+    "requiresRuntime": false
+  },
   "activation": {
     "onStartup": false,
     "onCommands": ["xbox"],

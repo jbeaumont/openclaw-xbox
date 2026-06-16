@@ -1,6 +1,6 @@
 import { xblFetch } from "../client.js";
 import { EmptyParamSchema, XuidParamSchema, GamertagParamSchema, Friend } from "../types.js";
-import { normalizeList, formatFriendsList } from "../format.js";
+import { normalizeList, formatFriendsList, formatPresence } from "../format.js";
 import { toolResult } from "../result.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +24,7 @@ export function registerPresenceTools(api: any, apiKey: string) {
       parameters: XuidParamSchema,
       async execute(_id: string, { xuid }: { xuid: string }) {
         const data = await xblFetch<unknown>(apiKey, `/${encodeURIComponent(xuid)}/presence`);
-        return toolResult(JSON.stringify(data, null, 2));
+        return toolResult(formatPresence(data));
       },
     }
   );
@@ -39,7 +39,7 @@ export function registerPresenceTools(api: any, apiKey: string) {
         const person = normalizeList<Friend>(searchRaw, "people")[0];
         if (!person?.xuid) return toolResult(`No player found for gamertag: ${gamertag}`);
         const data = await xblFetch<unknown>(apiKey, `/${encodeURIComponent(person.xuid)}/presence`);
-        return toolResult(JSON.stringify(data, null, 2));
+        return toolResult(`${person.gamertag ?? gamertag}\n${formatPresence(data)}`);
       },
     }
   );

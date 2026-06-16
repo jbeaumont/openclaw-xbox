@@ -1,6 +1,6 @@
 import { xblFetch, XblApiError } from "../client.js";
 import { ClubSearchParamSchema, ClubIdParamSchema, ProductIdParamSchema } from "../types.js";
-import { normalizeList, formatClubs } from "../format.js";
+import { normalizeList, formatClubs, formatClubDetails, formatGameDetails } from "../format.js";
 import { toolResult } from "../result.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function registerClubTools(api, apiKey) {
@@ -19,7 +19,7 @@ export function registerClubTools(api, apiKey) {
         parameters: ClubIdParamSchema,
         async execute(_id, { clubId }) {
             const data = await xblFetch(apiKey, `/clubs/${encodeURIComponent(clubId)}`);
-            return toolResult(JSON.stringify(data, null, 2));
+            return toolResult(formatClubDetails(data));
         },
     });
 }
@@ -32,7 +32,7 @@ export function registerCatalogTools(api, apiKey) {
         async execute(_id, { productId }) {
             try {
                 const data = await xblFetch(apiKey, `/marketplace/details/${encodeURIComponent(productId)}`);
-                return toolResult(JSON.stringify(data, null, 2));
+                return toolResult(formatGameDetails(data, productId));
             }
             catch (err) {
                 // xbl.io returns 404, or a 500 with a NOT_FOUND body, when a product ID
