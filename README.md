@@ -48,6 +48,10 @@ That's it — setting the key **auto-enables** the plugin (no separate
 `plugins enable` step). Prefer not to store the key in config? Set the
 `OPENCLAW_XBOX_API_KEY` environment variable instead. Then restart the gateway.
 
+The plugin also registers an `xbl-io` provider with OpenClaw's setup flow, so
+**`openclaw onboard`** can prompt you for this key as part of guided setup if you
+prefer that over `config set`.
+
 The plugin is startup-lazy: it loads on demand when you use `/xbox` or when its
 config is present, so it adds no cost to gateway startup until you actually use it.
 
@@ -145,25 +149,10 @@ calls; if you hit the limit the plugin reports how long to wait.
 
 ---
 
-## Development
+## Contributing
 
-```bash
-npm install
-npm run typecheck
-npm run rebuild   # cleans and rebuilds dist/
-```
-
-The compiled `dist/` is committed so git installs work without a build step. CI fails
-if `dist/` drifts from `src/` — run `npm run rebuild` and commit before pushing.
-
-### Publishing to ClawHub
-
-```bash
-npm i -g clawhub
-clawhub login
-clawhub package publish . --family code-plugin --dry-run   # preview
-clawhub package publish . --family code-plugin
-```
+Development setup, build/test, and release/publishing steps live in
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 

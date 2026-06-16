@@ -18,6 +18,7 @@
     "tsconfig.json",
     "README.md",
     "CHANGELOG.md",
+    "CONTRIBUTING.md",
     "LICENSE"
   ],
   "engines": {
