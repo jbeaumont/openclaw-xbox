@@ -1,6 +1,6 @@
 {
   "name": "@jbeaumont/openclaw-xbox",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "OpenClaw plugin for Xbox Live via xbl.io — profiles, presence, achievements, Game Pass, title history, DVR media, clubs, and sessions",
   "type": "module",
   "license": "MIT",

@@ -20,7 +20,7 @@ Read-only by default. State-changing actions (add/remove friend, send message) a
 [ClawHub](https://docs.openclaw.ai/clawhub) is OpenClaw's plugin registry:
 
 ```bash
-openclaw plugins install clawhub:openclaw-xbox
+openclaw plugins install clawhub:@jbeaumont/openclaw-xbox
 ```
 
 ### From git
