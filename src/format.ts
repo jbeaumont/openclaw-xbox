@@ -164,15 +164,40 @@ export function formatTitleHistory(titles: TitleHistoryEntry[], limit = 25): str
   return lines.join("\n");
 }
 
+/** Best capture date across the variants screenshots/clips use. */
+export function pickMediaDate(m: MediaItem): string | undefined {
+  return m.dateTaken ?? m.dateRecorded ?? m.datePublished;
+}
+
+/**
+ * Best download/stream link for a DVR item. Xbox returns links in arrays
+ * (gameClipUris / screenshotUris / contentLocators), preferring a "Download"
+ * entry; xbl.io may reshape these, so check every known variant and fall back
+ * to a flat `uri`.
+ */
+export function pickMediaUri(m: MediaItem): string | undefined {
+  const arrays = [m.gameClipUris, m.screenshotUris, m.contentLocators];
+  for (const arr of arrays) {
+    if (!arr?.length) continue;
+    const download = arr.find(
+      (u) => u.uri && (u.uriType === "Download" || u.locatorType === "Download")
+    );
+    const chosen = download ?? arr.find((u) => u.uri);
+    if (chosen?.uri) return chosen.uri;
+  }
+  return m.uri;
+}
+
 export function formatMedia(items: MediaItem[], kind: "screenshots" | "clips", limit = 20): string {
   if (items.length === 0) return `No ${kind} found.`;
   const icon = kind === "clips" ? "🎬" : "📸";
   const lines = [`${icon} **${kind === "clips" ? "Game clips" : "Screenshots"}** — ${items.length} captured`, ""];
   for (const m of items.slice(0, limit)) {
-    const when = m.dateTaken ?? m.datePublished;
+    const when = pickMediaDate(m);
+    const uri = pickMediaUri(m);
     let line = `• ${m.titleName ?? m.titleId ?? "Unknown title"}`;
     if (when) line += ` — ${when.slice(0, 10)}`;
-    if (m.uri) line += `\n  🔗 ${m.uri}`;
+    if (uri) line += `\n  🔗 ${uri}`;
     lines.push(line);
   }
   if (items.length > limit) lines.push(`…and ${items.length - limit} more.`);

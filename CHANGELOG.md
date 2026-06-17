@@ -3,6 +3,14 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- DVR clips/screenshots now render their download link and capture date. The
+  Xbox API returns links inside `gameClipUris` / `screenshotUris` /
+  `contentLocators` arrays (and clips date as `dateRecorded`); the parser is now
+  defensive across those variants instead of expecting a flat `uri`/`dateTaken`.
+
 ## [0.4.2] - 2026-06-16
 
 ### Fixed
