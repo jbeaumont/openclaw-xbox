@@ -103,6 +103,20 @@ describe("live xbl.io endpoint reachability — paths I could not verify offline
     }
     await probePath(`/marketplace/details/${encodeURIComponent(productId)}`);
   });
+
+  // Confirmed available via discovery probe; these back the Item 2 tools.
+  test("recent players endpoint path", opts, async () => {
+    await probePath("/recent-players");
+  });
+  test("activity feed endpoint path", opts, async () => {
+    await probePath("/activity/feed");
+  });
+  test("activity history endpoint path", opts, async () => {
+    await probePath("/activity/history");
+  });
+  test("alerts endpoint path", opts, async () => {
+    await probePath("/alerts");
+  });
 });
 
 describe("live DVR shape inspection (prints real field names to tune the parser)", () => {

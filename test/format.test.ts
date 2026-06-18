@@ -16,6 +16,9 @@ import {
   formatClubDetails,
   formatGameDetails,
   formatAchievementList,
+  formatRecentPlayers,
+  formatActivity,
+  formatAlerts,
 } from "../src/format.js";
 import type { Profile, Friend, GameTitle } from "../src/types.js";
 
@@ -198,5 +201,46 @@ describe("detail formatters (previously raw JSON)", () => {
     ] });
     assert.match(out, /✅ First Blood — 20G/);
     assert.match(out, /⬜ Hidden/);
+  });
+});
+
+describe("social formatters (Item 2)", () => {
+  test("recent players lists gamertags", () => {
+    const out = formatRecentPlayers([
+      { xuid: "1", gamertag: "Ava", presenceText: "Halo Infinite" },
+      { xuid: "2", modernGamertag: "Bo" },
+    ]);
+    assert.match(out, /Recently played with\*\* — 2/);
+    assert.match(out, /Ava — Halo Infinite/);
+    assert.match(out, /Bo/);
+  });
+  test("recent players empty", () => {
+    assert.equal(formatRecentPlayers([]), "No recent players found.");
+  });
+  test("activity feed renders author + description + date", () => {
+    const out = formatActivity(
+      [{ authorInfo: { modernGamertag: "Ava" }, description: "unlocked an achievement", date: "2026-06-10T00:00:00Z" }],
+      "Activity feed"
+    );
+    assert.match(out, /Activity feed\*\* — 1 items/);
+    assert.match(out, /\*\*Ava\*\* — unlocked an achievement/);
+    assert.match(out, /2026-06-10/);
+  });
+  test("activity falls back when fields are unfamiliar", () => {
+    const out = formatActivity([{ activityItemType: "Played" }], "Activity history");
+    assert.match(out, /Played/);
+  });
+  test("alerts mark unseen and render text", () => {
+    const out = formatAlerts([
+      { text: "New friend request", seen: false, timestamp: "2026-06-11T00:00:00Z" },
+      { title: "Achievement unlocked", seen: true },
+    ]);
+    assert.match(out, /Alerts\*\* — 2/);
+    assert.match(out, /🆕 New friend request/);
+    assert.match(out, /2026-06-11/);
+    assert.match(out, /Achievement unlocked/);
+  });
+  test("alerts empty", () => {
+    assert.equal(formatAlerts([]), "No alerts.");
   });
 });

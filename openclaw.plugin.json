@@ -23,6 +23,10 @@
       "xbox_search_clubs",
       "xbox_club_details",
       "xbox_game_details",
+      "xbox_recent_players",
+      "xbox_activity_feed",
+      "xbox_activity_history",
+      "xbox_alerts",
       "xbox_add_friend",
       "xbox_remove_friend",
       "xbox_send_message"
@@ -48,6 +52,10 @@
     "xbox_search_clubs": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
     "xbox_club_details": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
     "xbox_game_details": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_recent_players": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_activity_feed": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_activity_history": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
+    "xbox_alerts": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey"] }] },
     "xbox_add_friend": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] },
     "xbox_remove_friend": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] },
     "xbox_send_message": { "configSignals": [{ "rootPath": "plugins.entries.openclaw-xbox.config", "required": ["apiKey", "enableWriteTools"] }] }

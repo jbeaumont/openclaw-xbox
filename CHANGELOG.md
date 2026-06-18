@@ -6,6 +6,10 @@ All notable changes to this project are documented here. This project adheres to
 ## [Unreleased]
 
 ### Added
+- New read tools (verified against the live API): `xbox_recent_players`,
+  `xbox_activity_feed`, `xbox_activity_history`, and `xbox_alerts`. (Player stats
+  and followers/following were probed but aren't available on xbl.io, so they
+  were not added.)
 - Proactive notifications (opt-in, off by default): a background service polls
   for friend-online / new-clip events and surfaces a single coalesced alert.
   Designed for low cost — polling uses no model tokens, alerts piggyback on your

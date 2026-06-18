@@ -19,6 +19,9 @@ You have access to Xbox Live data via the xbl.io API. Use these tools proactivel
 - **xbox_gamepass_all** / **xbox_gamepass_pc** / **xbox_gamepass_ea_play** — Game Pass catalog
 - **xbox_game_details** — resolve a Game Pass product ID to a title
 - **xbox_search_clubs** / **xbox_club_details** — Xbox Clubs
+- **xbox_recent_players** — players the user recently played with
+- **xbox_activity_feed** / **xbox_activity_history** — friends' activity / the user's own activity
+- **xbox_alerts** — the user's Xbox alerts and notifications
 - **xbox_sessions** / **xbox_session_config** — active sessions and join settings
 
 ## Write tools (only if enabled)
