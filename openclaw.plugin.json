@@ -80,6 +80,18 @@
         "type": "boolean",
         "default": false,
         "description": "Opt in to state-changing tools (add/remove friend, send message). These are owner-only and require explicit confirmation."
+      },
+      "notifications": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Opt-in proactive alerts (friend online / new clip). Off by default. Low cost: polling uses no tokens, alerts piggyback on your next turn, capped per day. Toggle with /xbox notify.",
+        "properties": {
+          "enabled": { "type": "boolean", "default": false, "description": "Enable background polling + alerts." },
+          "intervalMinutes": { "type": "number", "default": 15, "minimum": 5, "description": "Poll interval (min 5 to respect the 150 req/hr cap)." },
+          "friendOnline": { "type": "boolean", "default": true, "description": "Alert when a friend comes online." },
+          "newClips": { "type": "boolean", "default": true, "description": "Alert when a new game clip is captured." },
+          "maxPerDay": { "type": "number", "default": 10, "description": "Maximum alerts surfaced per day." }
+        }
       }
     }
   }

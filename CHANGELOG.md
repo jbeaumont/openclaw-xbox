@@ -5,6 +5,14 @@ All notable changes to this project are documented here. This project adheres to
 
 ## [Unreleased]
 
+### Added
+- Proactive notifications (opt-in, off by default): a background service polls
+  for friend-online / new-clip events and surfaces a single coalesced alert.
+  Designed for low cost — polling uses no model tokens, alerts piggyback on your
+  next turn (no extra agent turns), are capped per day, and each alert
+  self-advertises how to turn them off. New `/xbox notify` status command and a
+  security-audit finding when enabled.
+
 ### Fixed
 - DVR clips/screenshots now render their download link and capture date. The
   Xbox API returns links inside `gameClipUris` / `screenshotUris` /

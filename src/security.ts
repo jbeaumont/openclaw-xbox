@@ -33,6 +33,18 @@ export function collectXboxSecurityFindings(ctx: AuditContext): SecurityFinding[
     });
   }
 
+  if (cfg?.notifications?.enabled === true) {
+    findings.push({
+      checkId: "openclaw-xbox.notifications-enabled",
+      severity: "info",
+      title: "Xbox proactive notifications enabled",
+      detail:
+        "A background service periodically polls xbl.io for friend-online / new-clip events. Polling uses no model tokens; alerts piggyback on your next turn (no extra agent turns) and are capped per day.",
+      remediation:
+        "Set plugins.entries.openclaw-xbox.config.notifications.enabled to false to stop polling (or run /xbox notify).",
+    });
+  }
+
   const key = cfg?.apiKey;
   if (typeof key === "string" && key.length > 0 && !key.startsWith("secret://")) {
     findings.push({

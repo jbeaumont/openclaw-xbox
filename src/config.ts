@@ -1,6 +1,20 @@
+export interface NotificationsConfig {
+  /** Master switch — off by default. No background activity unless true. */
+  enabled?: boolean;
+  /** Poll interval in minutes (default 15, floored to 5 to respect the 150 req/hr cap). */
+  intervalMinutes?: number;
+  /** Alert when a friend transitions offline -> online. */
+  friendOnline?: boolean;
+  /** Alert when a new game clip is captured. */
+  newClips?: boolean;
+  /** Max alerts surfaced per day (default 10). */
+  maxPerDay?: number;
+}
+
 export interface XboxPluginConfig {
   apiKey?: string;
   enableWriteTools?: boolean;
+  notifications?: NotificationsConfig;
 }
 
 /**
@@ -27,5 +41,7 @@ export function resolveConfig(api: any): XboxPluginConfig {
     fromNested?.enableWriteTools ??
     process.env.OPENCLAW_XBOX_ENABLE_WRITE_TOOLS === "true";
 
-  return { apiKey, enableWriteTools };
+  const notifications = fromPlugin?.notifications ?? fromNested?.notifications ?? undefined;
+
+  return { apiKey, enableWriteTools, notifications };
 }
