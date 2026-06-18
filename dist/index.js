@@ -11,6 +11,7 @@ import { registerWriteTools } from "./src/tools/write.js";
 import { registerCommands } from "./src/commands.js";
 import { resolveConfig } from "./src/config.js";
 import { collectXboxSecurityFindings } from "./src/security.js";
+import { createNotificationService } from "./src/notifications.js";
 import { READ_TOOLS, WRITE_TOOLS } from "./src/tool-names.js";
 const AUTO_ENABLE_PATH = "plugins.entries.openclaw-xbox.config.apiKey";
 export default definePluginEntry({
@@ -29,9 +30,9 @@ export default definePluginEntry({
         });
         // Contribute security findings to `openclaw` audits / ClawHub trust scans.
         api.registerSecurityAuditCollector?.(collectXboxSecurityFindings);
-        const { apiKey, enableWriteTools } = resolveConfig(api);
+        const { apiKey, enableWriteTools, notifications } = resolveConfig(api);
         // Commands are always registered — /xbox setup works even without a key
-        registerCommands(api, apiKey);
+        registerCommands(api, apiKey, notifications);
         if (!apiKey) {
             api.logger?.warn("openclaw-xbox: no apiKey configured — agent tools unavailable, run /xbox setup");
             return;
@@ -59,6 +60,24 @@ export default definePluginEntry({
             for (const toolName of WRITE_TOOLS) {
                 api.registerToolMetadata?.({ toolName, risk: "high", tags: ["xbox", "write"] });
             }
+        }
+        // Proactive notifications — opt-in only. Off by default = zero ambient cost.
+        // Alerts piggyback on the user's next turn (no extra agent turns), and each
+        // alert self-advertises how to disable them.
+        if (notifications?.enabled) {
+            const holder = {};
+            // Remember the most recent session so alerts can attach to the next turn.
+            api.registerAgentEventSubscription?.({
+                id: "openclaw-xbox-session-tracker",
+                streams: ["lifecycle"],
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                handle: (event) => {
+                    if (event?.sessionKey)
+                        holder.lastSessionKey = event.sessionKey;
+                },
+            });
+            api.registerService?.(createNotificationService(api, apiKey, notifications, holder));
+            api.logger?.info("openclaw-xbox: proactive notifications enabled (opt-in)");
         }
     },
 });

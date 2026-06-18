@@ -1,5 +1,6 @@
 import { xblFetch, XblApiError } from "./client.js";
 import { getSetting } from "./types.js";
+import { resolveNotifyOptions } from "./notifications.js";
 import { normalizeList, formatProfile, formatFriendsList, formatSearchResult, formatAchievements, formatGamePass, formatSessions, } from "./format.js";
 const HELP_TEXT = `
 **Xbox Live** — available commands:
@@ -13,7 +14,37 @@ const HELP_TEXT = `
   /xbox gamepass pc         PC Game Pass titles
   /xbox gamepass ea         EA Play titles
   /xbox sessions            Active sessions and party members
+  /xbox notify              Proactive-alert status and how to toggle it
 `.trim();
+function handleNotify(notifications) {
+    const enabled = notifications?.enabled === true;
+    const setPath = "openclaw config set plugins.entries.openclaw-xbox.config.notifications";
+    if (!enabled) {
+        return [
+            "🔕 **Xbox alerts: off**",
+            "",
+            "Get pinged when a friend comes online or you capture a clip. Alerts piggyback on your next message (low cost) and are capped per day.",
+            "",
+            "Enable:",
+            "```",
+            `${setPath}.enabled true`,
+            "```",
+        ].join("\n");
+    }
+    const { opts, intervalMs } = resolveNotifyOptions(notifications);
+    const watching = [opts.friendOnline ? "friends online" : null, opts.newClips ? "new clips" : null]
+        .filter(Boolean)
+        .join(", ");
+    return [
+        "🔔 **Xbox alerts: on**",
+        `Watching: ${watching || "nothing"} · every ${Math.round(intervalMs / 60000)} min · max ${opts.maxPerDay}/day`,
+        "",
+        "Turn off:",
+        "```",
+        `${setPath}.enabled false`,
+        "```",
+    ].join("\n");
+}
 async function handleSetup(apiKey) {
     if (!apiKey) {
         return [
@@ -99,7 +130,7 @@ async function handleSessions(apiKey) {
     return formatSessions(normalizeList(raw, "results"));
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function registerCommands(api, apiKey) {
+export function registerCommands(api, apiKey, notifications) {
     api.registerCommand({
         name: "xbox",
         description: "Xbox Live — /xbox help for all commands",
@@ -118,7 +149,7 @@ export function registerCommands(api, apiKey) {
             const parts = args.trim().split(/\s+/);
             const sub = parts[0]?.toLowerCase() ?? "";
             const rest = parts.slice(1).join(" ");
-            if (!apiKey && sub !== "setup" && sub !== "help" && sub !== "") {
+            if (!apiKey && sub !== "setup" && sub !== "help" && sub !== "" && sub !== "notify") {
                 return {
                     text: "⚠️  Xbox Live is not configured yet. Run `/xbox setup` to get started.",
                 };
@@ -146,6 +177,9 @@ export function registerCommands(api, apiKey) {
                         break;
                     case "sessions":
                         text = await handleSessions(apiKey);
+                        break;
+                    case "notify":
+                        text = handleNotify(notifications);
                         break;
                     case "help":
                     case "":

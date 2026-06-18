@@ -15,5 +15,6 @@ export function resolveConfig(api) {
     const enableWriteTools = fromPlugin?.enableWriteTools ??
         fromNested?.enableWriteTools ??
         process.env.OPENCLAW_XBOX_ENABLE_WRITE_TOOLS === "true";
-    return { apiKey, enableWriteTools };
+    const notifications = fromPlugin?.notifications ?? fromNested?.notifications ?? undefined;
+    return { apiKey, enableWriteTools, notifications };
 }
