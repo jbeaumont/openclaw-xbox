@@ -7,6 +7,7 @@ import { registerSessionTools } from "./src/tools/sessions.js";
 import { registerTitleTools } from "./src/tools/titles.js";
 import { registerMediaTools } from "./src/tools/media.js";
 import { registerClubTools, registerCatalogTools } from "./src/tools/clubs.js";
+import { registerSocialTools } from "./src/tools/social.js";
 import { registerWriteTools } from "./src/tools/write.js";
 import { registerCommands } from "./src/commands.js";
 import { resolveConfig } from "./src/config.js";
@@ -47,6 +48,7 @@ export default definePluginEntry({
         registerMediaTools(api, apiKey);
         registerClubTools(api, apiKey);
         registerCatalogTools(api, apiKey);
+        registerSocialTools(api, apiKey);
         // Write/destructive tools — opt-in only, owner-restricted, confirm-gated
         if (enableWriteTools) {
             registerWriteTools(api, apiKey);

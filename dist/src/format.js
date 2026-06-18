@@ -227,6 +227,54 @@ export function formatClubs(clubs, limit = 20) {
         lines.push(`…and ${clubs.length - limit} more.`);
     return lines.join("\n");
 }
+export function formatRecentPlayers(people, limit = 30) {
+    if (people.length === 0)
+        return "No recent players found.";
+    const lines = [`🕹️ **Recently played with** — ${people.length}`, ""];
+    for (const p of people.slice(0, limit)) {
+        const tag = p.modernGamertag ?? p.gamertag ?? p.xuid;
+        let line = `• ${tag}`;
+        if (p.presenceText)
+            line += ` — ${p.presenceText}`;
+        lines.push(line);
+    }
+    if (people.length > limit)
+        lines.push(`…and ${people.length - limit} more.`);
+    return lines.join("\n");
+}
+/** Format an Xbox activity feed/history list (item shapes vary, so be defensive). */
+export function formatActivity(items, label, limit = 15) {
+    if (items.length === 0)
+        return `No ${label.toLowerCase()} items found.`;
+    const lines = [`📰 **${label}** — ${items.length} items`, ""];
+    for (const raw of items.slice(0, limit)) {
+        const it = asRecord(raw);
+        const author = asRecord(it.authorInfo);
+        const who = author.modernGamertag ?? author.gamertag ?? author.name;
+        const what = it.description ?? it.shortDescription ?? it.contentTitle ?? it.activityItemType ?? "activity";
+        const when = typeof it.date === "string" ? ` (${it.date.slice(0, 10)})` : "";
+        lines.push(`• ${who ? `**${who}** — ` : ""}${what}${when}`);
+    }
+    if (items.length > limit)
+        lines.push(`…and ${items.length - limit} more.`);
+    return lines.join("\n");
+}
+export function formatAlerts(items, limit = 20) {
+    if (items.length === 0)
+        return "No alerts.";
+    const lines = [`🔔 **Alerts** — ${items.length}`, ""];
+    for (const raw of items.slice(0, limit)) {
+        const a = asRecord(raw);
+        const text = a.text ?? a.title ?? a.message ?? a.type ?? "alert";
+        const ts = typeof a.timestamp === "string" ? a.timestamp : typeof a.date === "string" ? a.date : undefined;
+        const when = ts ? ` (${ts.slice(0, 10)})` : "";
+        const unseen = a.seen === false || a.isRead === false ? " 🆕" : "";
+        lines.push(`•${unseen} ${text}${when}`);
+    }
+    if (items.length > limit)
+        lines.push(`…and ${items.length - limit} more.`);
+    return lines.join("\n");
+}
 export function formatClubDetails(raw) {
     const r = asRecord(raw);
     const wrapped = Array.isArray(r.clubs) ? r.clubs[0] : Array.isArray(r.results) ? r.results[0] : raw;

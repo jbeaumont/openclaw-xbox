@@ -23,6 +23,10 @@ export const READ_TOOLS = [
     "xbox_search_clubs",
     "xbox_club_details",
     "xbox_game_details",
+    "xbox_recent_players",
+    "xbox_activity_feed",
+    "xbox_activity_history",
+    "xbox_alerts",
 ];
 export const WRITE_TOOLS = ["xbox_add_friend", "xbox_remove_friend", "xbox_send_message"];
 export const ALL_TOOLS = [...READ_TOOLS, ...WRITE_TOOLS];
