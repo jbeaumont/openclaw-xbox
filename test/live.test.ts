@@ -104,3 +104,27 @@ describe("live xbl.io endpoint reachability — paths I could not verify offline
     await probePath(`/marketplace/details/${encodeURIComponent(productId)}`);
   });
 });
+
+describe("live DVR shape inspection (prints real field names to tune the parser)", () => {
+  function summarize(label: string, raw: unknown) {
+    const top = raw && typeof raw === "object" ? Object.keys(raw as object) : typeof raw;
+    const list = normalizeList<Record<string, unknown>>(raw, "values", "gameClips", "screenshots");
+    const first = list[0] ? Object.keys(list[0]) : [];
+    const uriArrays = list[0]
+      ? ["gameClipUris", "screenshotUris", "contentLocators", "thumbnails"].filter(
+          (k) => Array.isArray((list[0] as Record<string, unknown>)[k])
+        )
+      : [];
+    console.log(`  ${label}: topKeys=${JSON.stringify(top)} count=${list.length} itemKeys=${JSON.stringify(first)} uriArrays=${JSON.stringify(uriArrays)}`);
+    for (const k of uriArrays) {
+      const sample = (list[0] as Record<string, unknown[]>)[k]?.[0];
+      if (sample) console.log(`    ${k}[0] keys=${JSON.stringify(Object.keys(sample as object))}`);
+    }
+  }
+  test("print /dvr/gameclips shape", opts, async () => {
+    summarize("/dvr/gameclips", await xblFetch(apiKey!, "/dvr/gameclips", { ttlMs: 0 }));
+  });
+  test("print /dvr/screenshots shape", opts, async () => {
+    summarize("/dvr/screenshots", await xblFetch(apiKey!, "/dvr/screenshots", { ttlMs: 0 }));
+  });
+});

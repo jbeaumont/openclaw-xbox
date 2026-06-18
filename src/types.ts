@@ -68,12 +68,29 @@ export type Session = Static<typeof SessionSchema>;
 // A title-history entry reuses the GameTitle shape (name, achievement, titleHistory).
 export type TitleHistoryEntry = GameTitle;
 
+// A download/stream link entry. Xbox DVR returns these in arrays
+// (gameClipUris / screenshotUris / contentLocators), not as a flat string.
+export const MediaUriSchema = Type.Object({
+  uri: Type.Optional(Type.String()),
+  uriType: Type.Optional(Type.String()),
+  locatorType: Type.Optional(Type.String()),
+  thumbnailType: Type.Optional(Type.String()),
+});
+
 export const MediaItemSchema = Type.Object({
   titleId: Type.Optional(Type.String()),
   titleName: Type.Optional(Type.String()),
-  uri: Type.Optional(Type.String()),
+  // Capture date varies by media type: screenshots use dateTaken, clips dateRecorded.
   dateTaken: Type.Optional(Type.String()),
+  dateRecorded: Type.Optional(Type.String()),
   datePublished: Type.Optional(Type.String()),
+  // A single flat uri is rare, but accept it as a fallback.
+  uri: Type.Optional(Type.String()),
+  // Real download links live in one of these arrays.
+  gameClipUris: Type.Optional(Type.Array(MediaUriSchema)),
+  screenshotUris: Type.Optional(Type.Array(MediaUriSchema)),
+  contentLocators: Type.Optional(Type.Array(MediaUriSchema)),
+  thumbnails: Type.Optional(Type.Array(MediaUriSchema)),
 });
 export type MediaItem = Static<typeof MediaItemSchema>;
 

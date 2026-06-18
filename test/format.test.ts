@@ -120,10 +120,38 @@ describe("formatSessions / formatTitleHistory / formatMedia / formatClubs", () =
     assert.match(out, /GameX/);
     assert.match(out, /2026-06-01/);
   });
-  test("media lists links", () => {
+  test("media lists links (flat uri fallback)", () => {
     const out = formatMedia([{ titleName: "GameY", uri: "https://example/clip", dateTaken: "2026-05-05T00:00:00Z" }], "clips");
     assert.match(out, /Game clips/);
     assert.match(out, /https:\/\/example\/clip/);
+  });
+  test("clip: extracts download link from gameClipUris[] and dateRecorded", () => {
+    const out = formatMedia([{
+      titleName: "Halo Infinite",
+      dateRecorded: "2026-04-02T10:00:00Z",
+      gameClipUris: [
+        { uri: "https://stream/clip", uriType: "Stream" },
+        { uri: "https://dl/clip.mp4", uriType: "Download" },
+      ],
+    }], "clips");
+    assert.match(out, /Halo Infinite/);
+    assert.match(out, /2026-04-02/);
+    assert.match(out, /https:\/\/dl\/clip\.mp4/);   // prefers the Download entry
+  });
+  test("screenshot: extracts link from screenshotUris[]", () => {
+    const out = formatMedia([{
+      titleName: "Forza",
+      dateTaken: "2026-03-01T00:00:00Z",
+      screenshotUris: [{ uri: "https://dl/shot.png", uriType: "Download" }],
+    }], "screenshots");
+    assert.match(out, /https:\/\/dl\/shot\.png/);
+  });
+  test("clip: handles contentLocators variant", () => {
+    const out = formatMedia([{
+      titleName: "Doom",
+      contentLocators: [{ uri: "https://dl/locator.mp4", locatorType: "Download" }],
+    }], "clips");
+    assert.match(out, /https:\/\/dl\/locator\.mp4/);
   });
   test("clubs list with member counts", () => {
     const out = formatClubs([{ id: "c1", name: "ClawClub", membersCount: 42 }]);
