@@ -43,6 +43,22 @@ async function probePath(path: string): Promise<void> {
   }
 }
 
+/**
+ * Discovery probe for *candidate* endpoints whose paths we're unsure of. Unlike
+ * probePath this NEVER fails the test — it just reports the status and, on 200,
+ * the response's top-level keys so we can decide which tools to build.
+ */
+async function reportPath(path: string): Promise<void> {
+  try {
+    const raw = await xblFetch<unknown>(apiKey!, path, { ttlMs: 0 });
+    const keys = raw && typeof raw === "object" ? Object.keys(raw as object) : typeof raw;
+    console.log(`  ✓ ${path} → 200  keys=${JSON.stringify(keys)}`);
+  } catch (err) {
+    const status = err instanceof XblApiError ? err.status : "ERR";
+    console.log(`  ✗ ${path} → ${status}`);
+  }
+}
+
 describe("live xbl.io smoke — confirmed tools (read-only)", () => {
   test("xbox_my_profile returns a profile", opts, async () => {
     const out = textOf(await findTool(api(), "xbox_my_profile").execute("live"));
@@ -126,5 +142,30 @@ describe("live DVR shape inspection (prints real field names to tune the parser)
   });
   test("print /dvr/screenshots shape", opts, async () => {
     summarize("/dvr/screenshots", await xblFetch(apiKey!, "/dvr/screenshots", { ttlMs: 0 }));
+  });
+});
+
+describe("live xbl.io — Item 2 candidate endpoints (discovery, never fails)", () => {
+  test("probe candidate read endpoints", opts, async () => {
+    const account = await xblFetch<{ profileUsers: { id: string }[] }>(apiKey!, "/account", { ttlMs: 0 });
+    const xuid = account.profileUsers?.[0]?.id ?? "";
+    const candidates = [
+      "/recent-players",
+      `/recent-players/${xuid}`,
+      "/activity/feed",
+      "/activity/history",
+      "/alerts",
+      "/player/stats",
+      `/player/stats/${xuid}`,
+      `/${xuid}/stats`,
+      `/followers/${xuid}`,
+      "/following",
+      `/following/${xuid}`,
+    ];
+    console.log("  -- Item 2 candidate endpoints --");
+    for (const path of candidates) {
+      if (path.includes("//")) continue; // skip if xuid was empty
+      await reportPath(path);
+    }
   });
 });
